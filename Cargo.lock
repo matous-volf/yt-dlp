@@ -1756,7 +1756,7 @@ dependencies = [
 
 [[package]]
 name = "yt-dlp"
-version = "1.0.0"
+version = "1.0.1"
 dependencies = [
  "derive_more",
  "flate2",
