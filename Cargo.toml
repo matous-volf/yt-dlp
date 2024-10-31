@@ -1,0 +1,35 @@
+[package]
+name = "yt-dlp"
+version = "0.1.0"
+edition = "2021"
+
+authors = ["boul2gom <contact@boul2gom.fr>"]
+description = "An asynchronous Rust library (with auto dependencies downloading) for yt-dlp, a feature-rich youtube (and others) audio/video downloader"
+
+license = "GPL-3.0"
+readme = "README.md"
+documentation = "https://docs.rs/yt-dlp"
+homepage = "https://github.com/boul2gom/yt-dlp"
+repository = "https://github.com/boul2gom/yt-dlp"
+
+categories = ["api-bindings", "asynchronous", "development-tools"]
+keywords = ["youtube", "yt-dlp", "async", "downloader"]
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+reqwest = { version = "0.12.9", features = ["json", "stream"] }
+tokio = { version = "1.41.0", features = ["full"] }
+futures-util = "0.3.31"
+
+serde = { version = "1.0.214", features = ["derive"] }
+serde_json = "1.0.132"
+
+derive_more = { version = "1.0.0", features = ["display"] }
+thiserror = "1.0.65"
+
+ordered-float = "4.4.0"
+flate2 = "1.0.34"
+tar = "0.4.42"
+zip = "2.2.0"
+xz2 = "0.1.7"
