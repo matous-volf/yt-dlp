@@ -2,6 +2,7 @@ use crate::error::{Error, Result};
 use crate::fetcher::{FFmpeg, Fetcher, GitHubFetcher};
 use crate::model::format::{Format, FormatType};
 use crate::model::Video;
+use crate::utils::file_system;
 use derive_more::Display;
 use std::path::PathBuf;
 use std::sync::Arc;
@@ -70,7 +71,7 @@ pub mod utils;
 /// let output_dir = PathBuf::from("output");
 /// let url = "https://www.youtube.com/watch?v=dQw4w9WgXcQ".to_string();
 ///
-/// let mut fetcher = Youtube::new(executable, ffmpeg, url, output_dir);
+/// let mut fetcher = Youtube::new(executable, ffmpeg, url, output_dir).expect("Failed to create fetcher");
 /// fetcher.update_downloader().await.expect("Failed to update yt-dlp");
 /// # }
 /// ```
@@ -87,7 +88,7 @@ pub mod utils;
 /// let output_dir = PathBuf::from("output");
 /// let url = "https://www.youtube.com/watch?v=dQw4w9WgXcQ".to_string();
 ///
-/// let mut fetcher = Youtube::new(executable, ffmpeg, url, output_dir);
+/// let mut fetcher = Youtube::new(executable, ffmpeg, url, output_dir).expect("Failed to create fetcher");
 ///
 /// let video = fetcher.fetch_infos().await.expect("Failed to fetch video");
 /// println!("Video title: {}", video.title);
@@ -108,7 +109,7 @@ pub mod utils;
 /// let output_dir = PathBuf::from("output");
 /// let url = "https://www.youtube.com/watch?v=dQw4w9WgXcQ".to_string();
 ///
-/// let mut fetcher = Youtube::new(executable, ffmpeg, url, output_dir);
+/// let mut fetcher = Youtube::new(executable, ffmpeg, url, output_dir).expect("Failed to create fetcher");
 ///
 /// let video = fetcher.fetch_infos().await.expect("Failed to fetch video");
 /// println!("Video title: {}", video.title);
@@ -129,7 +130,7 @@ pub mod utils;
 /// let output_dir = PathBuf::from("output");
 /// let url = "https://www.youtube.com/watch?v=dQw4w9WgXcQ".to_string();
 ///
-/// let mut fetcher = Youtube::new(executable, ffmpeg, url, output_dir);
+/// let mut fetcher = Youtube::new(executable, ffmpeg, url, output_dir).expect("Failed to create fetcher");
 ///
 /// let video = fetcher.fetch_infos().await.expect("Failed to fetch video");
 /// println!("Video title: {}", video.title);
@@ -150,7 +151,7 @@ pub mod utils;
 /// let output_dir = PathBuf::from("output");
 /// let url = "https://www.youtube.com/watch?v=dQw4w9WgXcQ".to_string();
 ///
-/// let mut fetcher = Youtube::new(executable, ffmpeg, url, output_dir);
+/// let mut fetcher = Youtube::new(executable, ffmpeg, url, output_dir).expect("Failed to create fetcher");
 ///
 /// let video = fetcher.fetch_infos().await.expect("Failed to fetch video");
 /// println!("Video title: {}", video.title);
@@ -172,7 +173,7 @@ pub mod utils;
 /// let output_dir = PathBuf::from("output");
 /// let url = "https://www.youtube.com/watch?v=dQw4w9WgXcQ".to_string();
 ///
-/// let mut fetcher = Youtube::new(executable, ffmpeg, url, output_dir);
+/// let mut fetcher = Youtube::new(executable, ffmpeg, url, output_dir).expect("Failed to create fetcher");
 ///
 /// let video = fetcher.fetch_infos().await.expect("Failed to fetch video");
 /// println!("Video title: {}", video.title);
@@ -183,15 +184,36 @@ pub mod utils;
 /// fetcher.combine_audio_and_video("video.mp4", "audio.mp3", "output.mp4").await.expect("Failed to combine audio and video");
 /// # }
 /// ```
+///
+/// - 📸 Fetching a thumbnail and downloading it:
+/// ```rust, no_run
+/// # use yt_dlp::Youtube;
+/// # use std::path::PathBuf;
+///
+/// # #[tokio::main]
+/// # async fn main() {
+/// let ffmpeg = PathBuf::from("ffmpeg");
+/// let executable = PathBuf::from("yt-dlp");
+/// let output_dir = PathBuf::from("output");
+/// let url = "https://www.youtube.com/watch?v=dQw4w9WgXcQ".to_string();
+///
+/// let mut fetcher = Youtube::new(executable, ffmpeg, url, output_dir).expect("Failed to create fetcher");
+///
+/// let video = fetcher.fetch_infos().await.expect("Failed to fetch video");
+/// println!("Video title: {}", video.title);
+///
+/// fetcher.download_thumbnail("thumbnail.jpg").await.expect("Failed to download thumbnail");
+/// # }
+/// ```
 #[derive(Clone, Debug, Display)]
 #[display("Youtube: url={}, output_dir={:?}, args={:?}", url, output_dir, args)]
 pub struct Youtube {
-    executable_path: PathBuf,
-    ffmpeg_path: PathBuf,
-    url: String,
+    pub executable_path: PathBuf,
+    pub ffmpeg_path: PathBuf,
+    pub url: String,
 
-    output_dir: PathBuf,
-    args: Vec<String>,
+    pub output_dir: PathBuf,
+    pub args: Vec<String>,
 
     video: Option<Video>,
 }
@@ -206,8 +228,18 @@ impl Youtube {
     /// * `ffmpeg` - The path to the ffmpeg executable.
     /// * `url` - The URL of the video to fetch.
     /// * `output_dir` - The directory where the video will be downloaded.
-    pub fn new(executable: PathBuf, ffmpeg: PathBuf, url: String, output_dir: PathBuf) -> Self {
-        Self {
+    pub fn new(
+        executable: PathBuf,
+        ffmpeg: PathBuf,
+        url: String,
+        output_dir: PathBuf,
+    ) -> Result<Self> {
+        file_system::create_parent_dir(executable.clone())?;
+        file_system::create_parent_dir(ffmpeg.clone())?;
+
+        file_system::create_parent_dir(output_dir.clone())?;
+
+        Ok(Self {
             executable_path: executable,
             ffmpeg_path: ffmpeg,
             url,
@@ -215,7 +247,7 @@ impl Youtube {
 
             args: Vec::new(),
             video: None,
-        }
+        })
     }
 
     /// Creates a new YouTube fetcher, and installs the yt-dlp and ffmpeg binaries.
@@ -232,11 +264,11 @@ impl Youtube {
         url: String,
         output_dir: PathBuf,
     ) -> Result<Self> {
-        let yt_dlp = executables_dir.join("yt-dlp");
-        let ffmpeg = executables_dir.join("ffmpeg");
+        let yt_dlp = executables_dir.join(utils::fetch_executable("yt-dlp"));
+        let ffmpeg = executables_dir.join(utils::fetch_executable("ffmpeg"));
 
         Self::install_binaries(executables_dir).await?;
-        Ok(Self::new(yt_dlp, ffmpeg, url, output_dir))
+        Self::new(yt_dlp, ffmpeg, url, output_dir)
     }
 
     /// Installs the yt-dlp and ffmpeg binaries.
@@ -266,7 +298,7 @@ impl Youtube {
     /// * `destination` - The directory where the binary will be installed.
     pub async fn install_youtube(destination: PathBuf) -> Result<()> {
         let youtube = GitHubFetcher::new("yt-dlp", "yt-dlp");
-        let youtube_destination = destination.join("yt-dlp");
+        let youtube_destination = destination.join(utils::fetch_executable("yt-dlp"));
 
         let release = youtube.fetch_release(None).await?;
         release.download(youtube_destination).await?;
@@ -536,5 +568,32 @@ impl Youtube {
 
         executor.execute().await?;
         Ok(())
+    }
+
+    /// Downloads the thumbnail of the video, usually in the highest resolution available.
+    /// Be careful, this function may take a while to execute.
+    pub async fn download_thumbnail(&mut self, file_name: &str) -> Result<()> {
+        if self.video.is_none() {
+            self.fetch_infos().await?;
+        }
+
+        self.download_fetched_thumbnail(file_name).await
+    }
+
+    /// Downloads the thumbnail of the previously fetched video, usually in the highest resolution available.
+    /// You must have fetched the video information before calling this function.
+    /// Be careful, this function may take a while to execute.
+    pub async fn download_fetched_thumbnail(&self, file_name: &str) -> Result<()> {
+        if self.video.is_none() {
+            return Err(Error::Video("No video to download".to_string()));
+        }
+
+        let video = self.video.as_ref().unwrap();
+        let thumbnail = video.thumbnail.clone();
+
+        let path = self.output_dir.join(file_name);
+
+        let fetcher = Fetcher::new(&thumbnail);
+        fetcher.fetch_asset(path).await
     }
 }

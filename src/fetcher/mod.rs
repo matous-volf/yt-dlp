@@ -90,6 +90,10 @@ impl Fetcher {
     pub async fn fetch_asset(&self, destination: PathBuf) -> Result<()> {
         let response = reqwest::get(&self.url).await?.error_for_status()?;
 
+        if let Some(parent) = destination.parent() {
+            tokio::fs::create_dir_all(parent).await?;
+        }
+
         let mut dest = file_system::create_file(destination)?;
         let mut stream = response.bytes_stream();
 
@@ -273,27 +277,6 @@ impl FFmpeg {
         Self
     }
 
-    /// Fetch the name of the FFmpeg executable for the current platform.
-    /// If the platform is Windows, the name will be `ffmpeg.exe`, otherwise `ffmpeg`.
-    pub fn fetch_executable_name() -> String {
-        let platform = Platform::detect();
-
-        Self::fetch_executable_name_for_platform(platform)
-    }
-
-    /// Fetch the name of the FFmpeg executable for the given platform.
-    /// If the platform is Windows, the name will be `ffmpeg.exe`, otherwise `ffmpeg`.
-    ///
-    /// # Arguments
-    ///
-    /// * `platform` - The platform to fetch the executable name for.
-    pub fn fetch_executable_name_for_platform(platform: Platform) -> String {
-        match platform {
-            Platform::Windows => "ffmpeg.exe".to_string(),
-            _ => "ffmpeg".to_string(),
-        }
-    }
-
     /// Fetch the FFmpeg binary for the current platform and architecture.
     pub async fn fetch_binary(&self) -> Result<WantedRelease> {
         let platform = Platform::detect();
@@ -407,9 +390,9 @@ impl FFmpeg {
                 let parent = destination
                     .parent()
                     .ok_or(Error::Binary(platform, architecture))?;
-                let parent = parent.join("ffmpeg");
+                let binary = parent.join("ffmpeg.exe");
 
-                tokio::fs::copy(executable, parent).await?;
+                tokio::fs::copy(executable, binary).await?;
                 tokio::fs::remove_dir_all(destination).await?;
                 tokio::fs::remove_file(archive).await?;
             }

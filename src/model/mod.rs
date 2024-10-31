@@ -101,36 +101,7 @@ impl Video {
     pub fn best_video_format(&self) -> Option<&Format> {
         let video_formats = self.formats.iter().filter(|format| format.is_video());
 
-        video_formats.max_by(|a, b| {
-            let a_quality = a.quality_info.quality.unwrap_or(0.0);
-            let b_quality = b.quality_info.quality.unwrap_or(0.0);
-
-            let cmp_quality = OrderedFloat(a_quality).cmp(&OrderedFloat(b_quality));
-            if cmp_quality != std::cmp::Ordering::Equal {
-                return cmp_quality;
-            }
-
-            let a_height = a.video_resolution.height.unwrap_or(0);
-            let b_height = b.video_resolution.height.unwrap_or(0);
-
-            let cmp_height = a_height.cmp(&b_height);
-            if cmp_height != std::cmp::Ordering::Equal {
-                return cmp_height;
-            }
-
-            let a_fps = a.video_resolution.fps.unwrap_or(0.0);
-            let b_fps = b.video_resolution.fps.unwrap_or(0.0);
-
-            let cmp_fps = OrderedFloat(a_fps).cmp(&OrderedFloat(b_fps));
-            if cmp_fps != std::cmp::Ordering::Equal {
-                return cmp_fps;
-            }
-
-            let a_vbr = a.rates_info.video_rate.unwrap_or(0.0);
-            let b_vbr = b.rates_info.video_rate.unwrap_or(0.0);
-
-            OrderedFloat(a_vbr).cmp(&OrderedFloat(b_vbr))
-        })
+        video_formats.max_by(|a, b| self.compare_video_formats(a, b))
     }
 
     /// Returns the best audio format available.
@@ -139,35 +110,86 @@ impl Video {
     pub fn best_audio_format(&self) -> Option<&Format> {
         let audio_formats = self.formats.iter().filter(|format| format.is_audio());
 
-        audio_formats.max_by(|a, b| {
-            let a_quality = a.quality_info.quality.unwrap_or(0.0);
-            let b_quality = b.quality_info.quality.unwrap_or(0.0);
+        audio_formats.max_by(|a, b| self.compare_audio_formats(a, b))
+    }
 
-            let cmp_quality = OrderedFloat(a_quality).cmp(&OrderedFloat(b_quality));
-            if cmp_quality != std::cmp::Ordering::Equal {
-                return cmp_quality;
-            }
+    /// Returns the worst video format available.
+    /// Formats sorting : "quality", "video resolution", "fps", "video bitrate"
+    /// If the video has no formats video formats, it returns None.
+    pub fn worst_video_format(&self) -> Option<&Format> {
+        let video_formats = self.formats.iter().filter(|format| format.is_video());
 
-            let a_abr = a.rates_info.audio_rate.unwrap_or(0.0);
-            let b_abr = b.rates_info.audio_rate.unwrap_or(0.0);
+        video_formats.min_by(|a, b| self.compare_video_formats(a, b))
+    }
 
-            let cmp_abr = OrderedFloat(a_abr).cmp(&OrderedFloat(b_abr));
-            if cmp_abr != std::cmp::Ordering::Equal {
-                return cmp_abr;
-            }
+    /// Returns the worst audio format available.
+    /// Formats sorting : "quality", "audio bitrate", "sample rate", "audio channels"
+    /// If the video has no formats audio formats, it returns None.
+    pub fn worst_audio_format(&self) -> Option<&Format> {
+        let audio_formats = self.formats.iter().filter(|format| format.is_audio());
 
-            let a_asr = a.codec_info.asr.unwrap_or(0);
-            let b_asr = b.codec_info.asr.unwrap_or(0);
+        audio_formats.min_by(|a, b| self.compare_audio_formats(a, b))
+    }
 
-            let cmp_asr = a_asr.cmp(&b_asr);
-            if cmp_asr != std::cmp::Ordering::Equal {
-                return cmp_asr;
-            }
+    pub fn compare_video_formats(&self, a: &Format, b: &Format) -> std::cmp::Ordering {
+        let a_quality = a.quality_info.quality.unwrap_or(0.0);
+        let b_quality = b.quality_info.quality.unwrap_or(0.0);
 
-            let a_channels = a.codec_info.audio_channels.unwrap_or(0);
-            let b_channels = b.codec_info.audio_channels.unwrap_or(0);
+        let cmp_quality = OrderedFloat(a_quality).cmp(&OrderedFloat(b_quality));
+        if cmp_quality != std::cmp::Ordering::Equal {
+            return cmp_quality;
+        }
 
-            a_channels.cmp(&b_channels)
-        })
+        let a_height = a.video_resolution.height.unwrap_or(0);
+        let b_height = b.video_resolution.height.unwrap_or(0);
+
+        let cmp_height = a_height.cmp(&b_height);
+        if cmp_height != std::cmp::Ordering::Equal {
+            return cmp_height;
+        }
+
+        let a_fps = a.video_resolution.fps.unwrap_or(0.0);
+        let b_fps = b.video_resolution.fps.unwrap_or(0.0);
+
+        let cmp_fps = OrderedFloat(a_fps).cmp(&OrderedFloat(b_fps));
+        if cmp_fps != std::cmp::Ordering::Equal {
+            return cmp_fps;
+        }
+
+        let a_vbr = a.rates_info.video_rate.unwrap_or(0.0);
+        let b_vbr = b.rates_info.video_rate.unwrap_or(0.0);
+
+        OrderedFloat(a_vbr).cmp(&OrderedFloat(b_vbr))
+    }
+
+    pub fn compare_audio_formats(&self, a: &Format, b: &Format) -> std::cmp::Ordering {
+        let a_quality = a.quality_info.quality.unwrap_or(0.0);
+        let b_quality = b.quality_info.quality.unwrap_or(0.0);
+
+        let cmp_quality = OrderedFloat(a_quality).cmp(&OrderedFloat(b_quality));
+        if cmp_quality != std::cmp::Ordering::Equal {
+            return cmp_quality;
+        }
+
+        let a_abr = a.rates_info.audio_rate.unwrap_or(0.0);
+        let b_abr = b.rates_info.audio_rate.unwrap_or(0.0);
+
+        let cmp_abr = OrderedFloat(a_abr).cmp(&OrderedFloat(b_abr));
+        if cmp_abr != std::cmp::Ordering::Equal {
+            return cmp_abr;
+        }
+
+        let a_asr = a.codec_info.asr.unwrap_or(0);
+        let b_asr = b.codec_info.asr.unwrap_or(0);
+
+        let cmp_asr = a_asr.cmp(&b_asr);
+        if cmp_asr != std::cmp::Ordering::Equal {
+            return cmp_asr;
+        }
+
+        let a_channels = a.codec_info.audio_channels.unwrap_or(0);
+        let b_channels = b.codec_info.audio_channels.unwrap_or(0);
+
+        a_channels.cmp(&b_channels)
     }
 }

@@ -1,4 +1,5 @@
 use crate::error::Result;
+use crate::fetcher::platform::Platform;
 use tokio::task::JoinHandle;
 
 pub mod executor;
@@ -6,6 +7,15 @@ pub mod file_system;
 
 pub fn to_owned(vec: Vec<&str>) -> Vec<String> {
     vec.into_iter().map(|s| s.to_owned()).collect()
+}
+
+pub fn fetch_executable(name: &str) -> String {
+    let platform = Platform::detect();
+
+    match platform {
+        Platform::Windows => format!("{}.exe", name),
+        _ => name.to_owned(),
+    }
 }
 
 /// Awaits two futures and returns a tuple of their results.

@@ -205,6 +205,7 @@ pub enum Extension {
     Mhtml,
 
     #[default]
+    #[serde(other)]
     Unknown,
 }
 
@@ -220,6 +221,7 @@ pub enum Container {
     Mp4,
 
     #[default]
+    #[serde(other)]
     Unknown,
 }
 
@@ -236,6 +238,7 @@ pub enum Protocol {
     Mhtml,
 
     #[default]
+    #[serde(other)]
     Unknown,
 }
 
@@ -246,6 +249,7 @@ pub enum DynamicRange {
     HDR,
 
     #[default]
+    #[serde(other)]
     Unknown,
 }
 
@@ -259,6 +263,7 @@ pub enum FormatType {
     Storyboard,
 
     #[default]
+    #[serde(other)]
     Unknown,
 }
 

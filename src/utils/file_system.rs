@@ -26,6 +26,20 @@ pub fn create_file(destination: PathBuf) -> Result<File> {
     Ok(file)
 }
 
+/// Creates the parent directory of the given destination.
+/// If the parent directory already exists, nothing is done.
+///
+/// # Arguments
+///
+/// * `destination` - The path to create the parent directory for.
+pub fn create_parent_dir(destination: PathBuf) -> Result<()> {
+    if let Some(parent) = destination.parent() {
+        std::fs::create_dir_all(parent)?;
+    }
+
+    Ok(())
+}
+
 /// Extracts a zip file to the given destination.
 ///
 /// # Arguments

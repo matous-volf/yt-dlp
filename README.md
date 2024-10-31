@@ -92,7 +92,7 @@ pub async fn main() {
     let output_dir = PathBuf::from("output");
     let url = "https://www.youtube.com/watch?v=dQw4w9WgXcQ".to_string();
 
-    let mut fetcher = Youtube::new(executable, ffmpeg, url, output_dir);
+    let mut fetcher = Youtube::new(executable, ffmpeg, url, output_dir).expect("Failed to create fetcher");
     fetcher.update_downloader().await.expect("Failed to update yt-dlp");
 }
 ```
@@ -109,7 +109,7 @@ pub async fn main() {
     let output_dir = PathBuf::from("output");
     let url = "https://www.youtube.com/watch?v=dQw4w9WgXcQ".to_string();
 
-    let mut fetcher = Youtube::new(executable, ffmpeg, url, output_dir);
+    let mut fetcher = Youtube::new(executable, ffmpeg, url, output_dir).expect("Failed to create fetcher");
 
     let video = fetcher.fetch_infos().await.expect("Failed to fetch video infos");
     println!("Video title: {}", video.title);
@@ -130,7 +130,7 @@ pub async fn main() {
     let output_dir = PathBuf::from("output");
     let url = "https://www.youtube.com/watch?v=dQw4w9WgXcQ".to_string();
 
-    let mut fetcher = Youtube::new(executable, ffmpeg, url, output_dir);
+    let mut fetcher = Youtube::new(executable, ffmpeg, url, output_dir).expect("Failed to create fetcher");
 
     let video = fetcher.fetch_infos().await.expect("Failed to fetch video infos");
     println!("Video title: {}", video.title);
@@ -151,7 +151,7 @@ pub async fn main() {
     let output_dir = PathBuf::from("output");
     let url = "https://www.youtube.com/watch?v=dQw4w9WgXcQ".to_string();
 
-    let mut fetcher = Youtube::new(executable, ffmpeg, url, output_dir);
+    let mut fetcher = Youtube::new(executable, ffmpeg, url, output_dir).expect("Failed to create fetcher");
 
     let audio = fetcher.fetch_audio_infos().await.expect("Failed to fetch audio infos");
     println!("Audio title: {}", audio.title);
@@ -172,7 +172,7 @@ pub async fn main() {
     let output_dir = PathBuf::from("output");
     let url = "https://www.youtube.com/watch?v=dQw4w9WgXcQ".to_string();
 
-    let mut fetcher = Youtube::new(executable, ffmpeg, url, output_dir);
+    let mut fetcher = Youtube::new(executable, ffmpeg, url, output_dir).expect("Failed to create fetcher");
 
     let video = fetcher.fetch_infos().await.expect("Failed to fetch video infos");
     println!("Video title: {}", video.title);
@@ -194,7 +194,7 @@ pub async fn main() {
     let output_dir = PathBuf::from("output");
     let url = "https://www.youtube.com/watch?v=dQw4w9WgXcQ".to_string();
 
-    let mut fetcher = Youtube::new(executable, ffmpeg, url, output_dir);
+    let mut fetcher = Youtube::new(executable, ffmpeg, url, output_dir).expect("Failed to create fetcher");
 
     let video = fetcher.fetch_infos().await.expect("Failed to fetch video infos");
     println!("Video title: {}", video.title);
@@ -203,6 +203,27 @@ pub async fn main() {
     fetcher.download_audio_stream("audio.mp3").await.expect("Failed to download audio");
 
     fetcher.combine_audio_and_video("video.mp4", "audio.mp3", "output.mp4").await.expect("Failed to combine audio and video");
+}
+```
+
+- 📸 Fetching a thumbnail and downloading it:
+```rust
+use yt_dlp::Youtube;
+use std::path::PathBuf;
+
+#[tokio::main]
+pub async fn main() {
+    let ffmpeg = PathBuf::from("ffmpeg");
+    let executable = PathBuf::from("yt-dlp");
+    let output_dir = PathBuf::from("output");
+    let url = "https://www.youtube.com/watch?v=dQw4w9WgXcQ".to_string();
+
+    let mut fetcher = Youtube::new(executable, ffmpeg, url, output_dir).expect("Failed to create fetcher");
+
+    let video = fetcher.fetch_infos().await.expect("Failed to fetch video infos");
+    println!("Video title: {}", video.title);
+    
+    fetcher.download_thumbnail("thumbnail.jpg").await.expect("Failed to download thumbnail");
 }
 ```
 
