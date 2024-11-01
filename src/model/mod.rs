@@ -1,3 +1,7 @@
+//! The models used to represent the data fetched by 'yt-dlp'.
+//!
+//! The represented data is the video information, thumbnails, automatic captions, and formats.
+
 use crate::model::caption::AutomaticCaption;
 use crate::model::format::Format;
 use crate::model::thumbnail::Thumbnail;
@@ -131,6 +135,8 @@ impl Video {
         audio_formats.min_by(|a, b| self.compare_audio_formats(a, b))
     }
 
+    /// Compares two video formats.
+    /// Formats sorting : "quality", "video resolution", "fps", "video bitrate"
     pub fn compare_video_formats(&self, a: &Format, b: &Format) -> std::cmp::Ordering {
         let a_quality = a.quality_info.quality.unwrap_or(0.0);
         let b_quality = b.quality_info.quality.unwrap_or(0.0);
@@ -162,6 +168,8 @@ impl Video {
         OrderedFloat(a_vbr).cmp(&OrderedFloat(b_vbr))
     }
 
+    /// Compares two audio formats.
+    /// Formats sorting : "quality", "audio bitrate", "sample rate", "audio channels"
     pub fn compare_audio_formats(&self, a: &Format, b: &Format) -> std::cmp::Ordering {
         let a_quality = a.quality_info.quality.unwrap_or(0.0);
         let b_quality = b.quality_info.quality.unwrap_or(0.0);

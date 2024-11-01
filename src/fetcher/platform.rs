@@ -1,15 +1,21 @@
+//! Platform and architecture detection.
+
 use derive_more::Display;
 
 /// Represents the operating system where the program is running.
 #[derive(Clone, Debug, Display)]
 pub enum Platform {
+    /// The Windows operating system.
     #[display("Windows")]
     Windows,
+    /// The Linux operating system.
     #[display("Linux")]
     Linux,
+    /// The MacOS operating system.
     #[display("MacOS")]
     Mac,
 
+    /// An unknown operating system.
     #[display("Unknown: {}", _0)]
     Unknown(String),
 }
@@ -17,15 +23,20 @@ pub enum Platform {
 /// Represents the architecture of the CPU where the program is running.
 #[derive(Clone, Debug, Display)]
 pub enum Architecture {
+    /// The x64 architecture.
     #[display("x64")]
     X64,
+    /// The x86_64 architecture.
     #[display("x86")]
     X86,
+    /// The ARMv7l architecture.
     #[display("armv7l")]
     Armv7l,
+    /// The Aarch64 (Arm64) architecture.
     #[display("aarch64")]
     Aarch64,
 
+    /// An unknown architecture.
     #[display("Unknown: {}", _0)]
     Unknown(String),
 }

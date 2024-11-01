@@ -1,3 +1,9 @@
+//! Tools for fetching data from a URL.
+//!
+//! This module contains structs for fetching data from GitHub and FFmpeg, or over HTTP.
+//! There is a platform module for detecting the current platform and architecture.
+//! It also contains structs for representing the fetched data, such as GitHub releases and assets.
+
 use crate::error::{Error, Result};
 use crate::fetcher::model::{Asset, Release, WantedRelease};
 use crate::fetcher::platform::{Architecture, Platform};
@@ -17,7 +23,6 @@ pub mod platform;
 /// ```rust, no_run
 /// # use yt_dlp::fetcher::Fetcher;
 /// # use std::path::PathBuf;
-///
 /// # #[tokio::main]
 /// # async fn main() {
 ///
@@ -31,6 +36,7 @@ pub mod platform;
 #[derive(Debug, Display)]
 #[display("Fetcher: {}", url)]
 pub struct Fetcher {
+    /// The URL to fetch data from.
     url: String,
 }
 
@@ -115,7 +121,6 @@ impl Fetcher {
 /// ```rust, no_run
 /// # use std::path::PathBuf;
 /// # use yt_dlp::fetcher::GitHubFetcher;
-///
 /// # #[tokio::main]
 /// # async fn main() {
 ///
@@ -128,7 +133,9 @@ impl Fetcher {
 #[derive(Debug, Display)]
 #[display("GitHub Fetcher: {}/{}", owner, repo)]
 pub struct GitHubFetcher {
+    /// The owner or organization of the GitHub repository.
     owner: String,
+    /// The name of the GitHub repository.
     repo: String,
 }
 
@@ -255,7 +262,6 @@ impl GitHubFetcher {
 /// ```rust, no_run
 /// # use yt_dlp::fetcher::FFmpeg;
 /// # use std::path::PathBuf;
-///
 /// # #[tokio::main]
 /// # async fn main() {
 ///

@@ -1,3 +1,5 @@
+//! Captions-related models.
+
 use serde::{Deserialize, Serialize};
 
 /// Represents an automatic caption of a YouTube video.
@@ -16,10 +18,16 @@ pub struct AutomaticCaption {
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 #[serde(rename_all = "snake_case")]
 pub enum Extension {
+    /// The JSON extension.
     Json3,
+    /// The Srv1 extension.
     Srv1,
+    /// The Srv2 extension.
     Srv2,
+    /// The Srv3 extension.
     Srv3,
+    /// The Ttml extension.
     Ttml,
+    /// The Vtt extension.
     Vtt,
 }

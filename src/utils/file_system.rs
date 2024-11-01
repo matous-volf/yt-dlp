@@ -1,3 +1,5 @@
+//! Tools for working with the file system.
+
 use crate::error::{Error, Result};
 use std::fs::{File, OpenOptions};
 use std::path::PathBuf;

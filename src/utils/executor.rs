@@ -1,3 +1,5 @@
+//! A tool for executing commands.
+
 use crate::error::{Error, Result};
 use std::path::PathBuf;
 use std::time::Duration;
@@ -12,7 +14,6 @@ use tokio::io::AsyncReadExt;
 /// # use std::path::PathBuf;
 /// # use std::time::Duration;
 /// # use yt_dlp::utils::executor::Executor;
-///
 /// # #[tokio::main]
 /// # async fn main() {
 /// let args = vec!["--update"];
@@ -28,17 +29,23 @@ use tokio::io::AsyncReadExt;
 /// # }
 #[derive(Debug, Clone, PartialEq)]
 pub struct Executor {
+    /// The path to the command executable.
     pub executable_path: PathBuf,
+    /// The timeout for the process.
     pub timeout: Duration,
 
+    /// The arguments to pass to the command.
     pub args: Vec<String>,
 }
 
 /// Represents the output of a process.
 #[derive(Debug, Clone, PartialEq)]
 pub struct ProcessOutput {
+    /// The stdout of the process.
     pub stdout: String,
+    /// The stderr of the process.
     pub stderr: String,
+    /// The exit code of the process.
     pub code: i32,
 }
 

@@ -1,3 +1,7 @@
+//! Utility functions and types used throughout the application.
+//!
+//! This module contains various utility to interact with the shell, and the file system.
+
 use crate::error::Result;
 use crate::fetcher::platform::Platform;
 use tokio::task::JoinHandle;
@@ -5,10 +9,12 @@ use tokio::task::JoinHandle;
 pub mod executor;
 pub mod file_system;
 
+/// Converts a vector of string slices to a vector of owned strings.
 pub fn to_owned(vec: Vec<&str>) -> Vec<String> {
     vec.into_iter().map(|s| s.to_owned()).collect()
 }
 
+/// Fetches the name of the executable for the given platform.
 pub fn fetch_executable(name: &str) -> String {
     let platform = Platform::detect();
 

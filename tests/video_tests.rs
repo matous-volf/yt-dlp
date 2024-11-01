@@ -55,7 +55,7 @@ pub async fn video_format_downloading_test() {
 
 #[cfg(test)]
 #[tokio::test]
-pub async fn video_audio_format_downloading_test() {
+pub async fn audio_format_downloading_test() {
     let mut fetcher = SHARED_SETUP.youtube.clone();
 
     let video = fetcher

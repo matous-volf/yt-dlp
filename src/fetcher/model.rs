@@ -1,3 +1,5 @@
+//! Fetchable-data models.
+
 use crate::error::Result;
 use crate::fetcher::Fetcher;
 use derive_more::Display;
@@ -8,7 +10,9 @@ use std::path::PathBuf;
 #[derive(Debug, Deserialize, Display)]
 #[display("Release: tag={}, assets={};", tag_name, assets.len())]
 pub struct Release {
+    /// The tag name of the release.
     pub tag_name: String,
+    /// The assets of the release.
     pub assets: Vec<Asset>,
 }
 
@@ -16,7 +20,9 @@ pub struct Release {
 #[derive(Debug, Deserialize, Display)]
 #[display("Asset: name={}, url={};", name, download_url)]
 pub struct Asset {
+    /// The name of the asset.
     pub name: String,
+    /// The download URL of the asset.
     #[serde(rename = "browser_download_url")]
     pub download_url: String,
 }
@@ -25,7 +31,9 @@ pub struct Asset {
 #[derive(Debug, Display)]
 #[display("WantedRelease: asset={}, url={};", asset_name, asset_url)]
 pub struct WantedRelease {
+    /// The name of the asset.
     pub asset_name: String,
+    /// The URL of the asset.
     pub asset_url: String,
 }
 

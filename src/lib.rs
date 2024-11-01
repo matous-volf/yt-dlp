@@ -6,7 +6,6 @@
 //! ```rust, no_run
 //! # use yt_dlp::Youtube;
 //! # use std::path::PathBuf;
-//!
 //! # #[tokio::main]
 //! # async fn main() {
 //! let destination = PathBuf::from("bin");
@@ -21,7 +20,6 @@
 //! ```rust, no_run
 //! # use yt_dlp::Youtube;
 //! # use std::path::PathBuf;
-//!
 //! # #[tokio::main]
 //! # async fn main() {
 //! let destination = PathBuf::from("bin");
@@ -34,7 +32,6 @@
 //! ```rust, no_run
 //! # use yt_dlp::Youtube;
 //! # use std::path::PathBuf;
-//!
 //! # #[tokio::main]
 //! # async fn main() {
 //! let destination = PathBuf::from("bin");
@@ -47,7 +44,6 @@
 //! ```rust, no_run
 //! # use yt_dlp::Youtube;
 //! # use std::path::PathBuf;
-//!
 //! # #[tokio::main]
 //! # async fn main() {
 //! let ffmpeg = PathBuf::from("ffmpeg");
@@ -64,7 +60,6 @@
 //! ```rust, no_run
 //! # use yt_dlp::Youtube;
 //! # use std::path::PathBuf;
-//!
 //! # #[tokio::main]
 //! # async fn main() {
 //! let ffmpeg = PathBuf::from("ffmpeg");
@@ -85,7 +80,6 @@
 //! ```rust, no_run
 //! # use yt_dlp::Youtube;
 //! # use std::path::PathBuf;
-//!
 //! # #[tokio::main]
 //! # async fn main() {
 //! let ffmpeg = PathBuf::from("ffmpeg");
@@ -106,7 +100,6 @@
 //! ```rust, no_run
 //! # use yt_dlp::Youtube;
 //! # use std::path::PathBuf;
-//!
 //! # #[tokio::main]
 //! # async fn main() {
 //! let ffmpeg = PathBuf::from("ffmpeg");
@@ -127,7 +120,6 @@
 //! ```rust, no_run
 //! # use yt_dlp::Youtube;
 //! # use std::path::PathBuf;
-//!
 //! # #[tokio::main]
 //! # async fn main() {
 //! let ffmpeg = PathBuf::from("ffmpeg");
@@ -149,7 +141,6 @@
 //! ```rust, no_run
 //! # use yt_dlp::Youtube;
 //! # use std::path::PathBuf;
-//!
 //! # #[tokio::main]
 //! # async fn main() {
 //! let ffmpeg = PathBuf::from("ffmpeg");
@@ -173,7 +164,6 @@
 //! ```rust, no_run
 //! # use yt_dlp::Youtube;
 //! # use std::path::PathBuf;
-//!
 //! # #[tokio::main]
 //! # async fn main() {
 //! let ffmpeg = PathBuf::from("ffmpeg");
@@ -207,6 +197,7 @@ pub mod model;
 pub mod utils;
 
 /// A YouTube video fetcher that uses yt-dlp to fetch video information and download it.
+///
 /// The 'yt-dlp' executable and 'ffmpeg' build can be installed with this fetcher.
 ///
 /// The video can be downloaded with or without its audio, and the audio and video can be combined.
@@ -217,7 +208,6 @@ pub mod utils;
 /// ```rust, no_run
 /// # use yt_dlp::Youtube;
 /// # use std::path::PathBuf;
-///
 /// # #[tokio::main]
 /// # async fn main() {
 /// let ffmpeg = PathBuf::from("ffmpeg");
@@ -318,29 +308,29 @@ impl Youtube {
         Ok(())
     }
 
-    /// Installs the yt-dlp binary.
+    /// Installs the yt-dlp binary, and returns its path.
     /// Be careful, this function may take a while to execute.
     ///
     /// # Arguments
     ///
     /// * `destination` - The directory where the binary will be installed.
-    pub async fn install_youtube(destination: PathBuf) -> Result<()> {
+    pub async fn install_youtube(destination: PathBuf) -> Result<PathBuf> {
         let youtube = GitHubFetcher::new("yt-dlp", "yt-dlp");
         let youtube_destination = destination.join(utils::fetch_executable("yt-dlp"));
 
         let release = youtube.fetch_release(None).await?;
-        release.download(youtube_destination).await?;
+        release.download(youtube_destination.clone()).await?;
 
-        Ok(())
+        Ok(youtube_destination)
     }
 
-    /// Installs the ffmpeg binary.
+    /// Installs the ffmpeg binary, and returns its path.
     /// Be careful, this function may take a while to execute.
     ///
     /// # Arguments
     ///
     /// * `destination` - The directory where the binary will be installed.
-    pub async fn install_ffmpeg(destination: PathBuf) -> Result<()> {
+    pub async fn install_ffmpeg(destination: PathBuf) -> Result<PathBuf> {
         let ffmpeg = FFmpeg::new();
         let ffmpeg_archive = destination.join("ffmpeg-release.zip");
 
@@ -348,7 +338,8 @@ impl Youtube {
         release.download(ffmpeg_archive.clone()).await?;
         ffmpeg.extract_binary(ffmpeg_archive).await?;
 
-        Ok(())
+        let ffmpeg_destination = destination.join(utils::fetch_executable("ffmpeg"));
+        Ok(ffmpeg_destination)
     }
 
     /// Sets the arguments to pass to yt-dlp.
@@ -411,13 +402,13 @@ impl Youtube {
         Ok(video)
     }
 
-    /// Downloads the video.
+    /// Downloads the video (with its audio), and returns its path.
     /// Be careful, this function may take a while to execute.
     ///
     /// # Errors
     ///
     /// This function will return an error if the video could not be fetched or downloaded.
-    pub async fn download_video(&mut self, file_name: &str) -> Result<()> {
+    pub async fn download_video(&mut self, file_name: &str) -> Result<PathBuf> {
         if self.video.is_none() {
             self.fetch_infos().await?;
         }
@@ -425,14 +416,14 @@ impl Youtube {
         self.download_fetched_video(file_name).await
     }
 
-    /// Downloads the previously fetched video.
+    /// Downloads the previously fetched video (with its audio), and returns its path.
     /// You must have fetched the video information before calling this function.
     /// Be careful, this function may take a while to execute.
     ///
     /// # Errors
     ///
     /// This function will return an error if the video could not be downloaded, or if there is no video to download.
-    pub async fn download_fetched_video(&self, file_name: &str) -> Result<()> {
+    pub async fn download_fetched_video(&self, file_name: &str) -> Result<PathBuf> {
         let youtube_arc = Arc::new(self.clone());
         let file_name = file_name.to_string();
 
@@ -465,18 +456,16 @@ impl Youtube {
             &format!("video_{}.mp4", file_name),
             &file_name,
         )
-        .await?;
-
-        Err(Error::Command("Failed to download video".to_string()))
+        .await
     }
 
-    /// Downloads the video only.
+    /// Downloads the video only, and returns its path.
     /// Be careful, this function may take a while to execute.
     ///
     /// # Errors
     ///
     /// This function will return an error if the video could not be fetched or downloaded.
-    pub async fn download_video_stream(&mut self, file_name: &str) -> Result<()> {
+    pub async fn download_video_stream(&mut self, file_name: &str) -> Result<PathBuf> {
         if self.video.is_none() {
             self.fetch_infos().await?;
         }
@@ -485,14 +474,14 @@ impl Youtube {
             .await
     }
 
-    /// Downloads the previously fetched video only.
+    /// Downloads the previously fetched video only, and returns its path.
     /// You must have fetched the video information before calling this function.
     /// Be careful, this function may take a while to execute.
     ///
     /// # Errors
     ///
     /// This function will return an error if the video could not be downloaded, or if there is no video to download.
-    pub async fn download_fetched_video_stream(&self, file_name: String) -> Result<()> {
+    pub async fn download_fetched_video_stream(&self, file_name: String) -> Result<PathBuf> {
         if self.video.is_none() {
             return Err(Error::Video("No video to download".to_string()));
         }
@@ -502,18 +491,16 @@ impl Youtube {
             .best_video_format()
             .ok_or(Error::Video("No video format available".to_string()))?;
 
-        self.download_format(best_video, &file_name).await?;
-
-        Err(Error::Command("Failed to download video".to_string()))
+        self.download_format(best_video, &file_name).await
     }
 
-    /// Downloads the audio.
+    /// Downloads the audio, and returns its path.
     /// Be careful, this function may take a while to execute.
     ///
     /// # Errors
     ///
     /// This function will return an error if the video could not be fetched or downloaded.
-    pub async fn download_audio_stream(&mut self, file_name: &str) -> Result<()> {
+    pub async fn download_audio_stream(&mut self, file_name: &str) -> Result<PathBuf> {
         if self.video.is_none() {
             self.fetch_infos().await?;
         }
@@ -522,14 +509,14 @@ impl Youtube {
             .await
     }
 
-    /// Downloads the previously fetched audio.
+    /// Downloads the previously fetched audio, and returns its path.
     /// You must have fetched the video information before calling this function.
     /// Be careful, this function may take a while to execute.
     ///
     /// # Errors
     ///
     /// This function will return an error if the video could not be downloaded, or if there is no video to download.
-    pub async fn download_fetched_audio_stream(&self, file_name: String) -> Result<()> {
+    pub async fn download_fetched_audio_stream(&self, file_name: String) -> Result<PathBuf> {
         if self.video.is_none() {
             return Err(Error::Video("No video to download".to_string()));
         }
@@ -539,26 +526,26 @@ impl Youtube {
             .best_audio_format()
             .ok_or(Error::Video("No audio format available".to_string()))?;
 
-        self.download_format(best_audio, &file_name).await?;
-
-        Err(Error::Command("Failed to download video".to_string()))
+        self.download_format(best_audio, &file_name).await
     }
 
-    /// Downloads a specific format.
+    /// Downloads a specific format, and returns its path.
     /// Be careful, this function may take a while to execute.
     ///
     /// # Errors
     ///
     /// This function will return an error if the video could not be downloaded.
-    pub async fn download_format(&self, format: &Format, file_name: &str) -> Result<()> {
+    pub async fn download_format(&self, format: &Format, file_name: &str) -> Result<PathBuf> {
         let path = self.output_dir.join(file_name);
         let url = format.download_info.url.clone();
 
         let fetcher = Fetcher::new(&url);
-        fetcher.fetch_asset(path).await
+        fetcher.fetch_asset(path.clone()).await?;
+
+        Ok(path)
     }
 
-    /// Combines the audio and video files.
+    /// Combines the audio and video files into a single file.
     /// Be careful, this function may take a while to execute.
     ///
     /// # Errors
@@ -569,10 +556,10 @@ impl Youtube {
         audio_file: &str,
         video_file: &str,
         output_file: &str,
-    ) -> Result<()> {
+    ) -> Result<PathBuf> {
         let audio_path = self.output_dir.join(audio_file);
         let video_path = self.output_dir.join(video_file);
-        let output = self.output_dir.join(output_file);
+        let output_path = self.output_dir.join(output_file);
 
         let audio = audio_path
             .to_str()
@@ -580,7 +567,7 @@ impl Youtube {
         let video = video_path
             .to_str()
             .ok_or(Error::Path("Invalid video path".to_string()))?;
-        let output = output
+        let output = output_path
             .to_str()
             .ok_or(Error::Path("Invalid output path".to_string()))?;
 
@@ -595,12 +582,12 @@ impl Youtube {
         };
 
         executor.execute().await?;
-        Ok(())
+        Ok(output_path)
     }
 
     /// Downloads the thumbnail of the video, usually in the highest resolution available.
     /// Be careful, this function may take a while to execute.
-    pub async fn download_thumbnail(&mut self, file_name: &str) -> Result<()> {
+    pub async fn download_thumbnail(&mut self, file_name: &str) -> Result<PathBuf> {
         if self.video.is_none() {
             self.fetch_infos().await?;
         }
@@ -611,7 +598,7 @@ impl Youtube {
     /// Downloads the thumbnail of the previously fetched video, usually in the highest resolution available.
     /// You must have fetched the video information before calling this function.
     /// Be careful, this function may take a while to execute.
-    pub async fn download_fetched_thumbnail(&self, file_name: &str) -> Result<()> {
+    pub async fn download_fetched_thumbnail(&self, file_name: &str) -> Result<PathBuf> {
         if self.video.is_none() {
             return Err(Error::Video("No video to download".to_string()));
         }
@@ -622,6 +609,8 @@ impl Youtube {
         let path = self.output_dir.join(file_name);
 
         let fetcher = Fetcher::new(&thumbnail);
-        fetcher.fetch_asset(path).await
+        fetcher.fetch_asset(path.clone()).await?;
+
+        Ok(path)
     }
 }

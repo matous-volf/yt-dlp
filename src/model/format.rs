@@ -1,3 +1,5 @@
+//! Formats-related models.
+
 use serde::{Deserialize, Serialize};
 
 /// Represents an available format of a video.
@@ -56,10 +58,12 @@ pub struct Format {
 }
 
 impl Format {
+    /// Checks if the format is a video format.
     pub fn is_video(&self) -> bool {
         self.format_type.is_video()
     }
 
+    /// Checks if the format is an audio format.
     pub fn is_audio(&self) -> bool {
         self.format_type.is_audio()
     }
@@ -198,12 +202,17 @@ pub struct HttpHeaders {
 #[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
 #[serde(rename_all = "snake_case")]
 pub enum Extension {
+    /// The M4A extension.
     M4A,
+    /// The MP3 extension.
     Mp4,
+    /// The Webm extension.
     Webm,
 
+    /// The MHTML extension.
     Mhtml,
 
+    /// An unknown extension.
     #[default]
     #[serde(other)]
     Unknown,
@@ -213,13 +222,17 @@ pub enum Extension {
 #[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
 #[serde(rename_all = "snake_case")]
 pub enum Container {
+    /// The Webm container.
     #[serde(rename = "webm_dash")]
     Webm,
+    /// The M4A container.
     #[serde(rename = "m4a_dash")]
     M4A,
+    /// The MP4 container.
     #[serde(rename = "mp4_dash")]
     Mp4,
 
+    /// An unknown container.
     #[default]
     #[serde(other)]
     Unknown,
@@ -237,6 +250,7 @@ pub enum Protocol {
     /// The MHTML protocol, used for storyboard formats.
     Mhtml,
 
+    /// An unknown protocol.
     #[default]
     #[serde(other)]
     Unknown,
@@ -245,9 +259,12 @@ pub enum Protocol {
 /// The available dynamic ranges of a format.
 #[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub enum DynamicRange {
+    /// The SDR dynamic range.
     SDR,
+    /// The HDR dynamic range.
     HDR,
 
+    /// An unknown dynamic range.
     #[default]
     #[serde(other)]
     Unknown,
@@ -255,19 +272,26 @@ pub enum DynamicRange {
 
 #[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub enum FormatType {
+    /// The format contains only audio.
     Audio,
+    /// The format contains only video.
     Video,
+    /// The format contains both audio and video.
     AudioAndVideo,
 
+    /// The format is a manifest.
     Manifest,
+    /// The format is a storyboard.
     Storyboard,
 
+    /// An unknown format type.
     #[default]
     #[serde(other)]
     Unknown,
 }
 
 impl FormatType {
+    /// Fetches the type of the format.
     pub fn fetch_type(format: &mut Format) {
         if format.download_info.manifest_url.is_some() {
             format.format_type = FormatType::Manifest;
@@ -290,18 +314,22 @@ impl FormatType {
         };
     }
 
+    /// Checks if the format is a video format.
     pub fn is_video(&self) -> bool {
         matches!(self, FormatType::Video | FormatType::AudioAndVideo)
     }
 
+    /// Checks if the format is an audio format.
     pub fn is_audio(&self) -> bool {
         matches!(self, FormatType::Audio | FormatType::AudioAndVideo)
     }
 
+    /// Checks if the format is a storyboard format.
     pub fn is_storyboard(&self) -> bool {
         matches!(self, FormatType::Storyboard)
     }
 
+    /// Checks if the format is a manifest format.
     pub fn is_manifest(&self) -> bool {
         matches!(self, FormatType::Manifest)
     }

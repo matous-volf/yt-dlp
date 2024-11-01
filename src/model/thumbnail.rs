@@ -1,3 +1,5 @@
+//! Thumbnails-related models.
+
 use serde::{Deserialize, Serialize};
 
 /// Represents a thumbnail of a YouTube video.
