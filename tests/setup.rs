@@ -1,5 +1,6 @@
 use std::path::PathBuf;
 use yt_dlp::{utils, Youtube};
+use yt_dlp::model::Video;
 
 #[cfg(test)]
 lazy_static::lazy_static! {
@@ -9,6 +10,7 @@ lazy_static::lazy_static! {
 #[cfg(test)]
 pub struct SharedSetup {
     pub youtube: Youtube,
+    pub video: Video,
     pub url: String,
 }
 
@@ -28,7 +30,12 @@ impl SharedSetup {
         let youtube = Youtube::new(executable_path, ffmpeg_path, url.clone(), output_dir)
             .expect("Failed to create YouTube instance");
 
-        Self { youtube, url }
+        let serialized_video = std::fs::read_to_string("tests/data/video_infos.json")
+            .expect("Failed to read video.json");
+        let video: Video = serde_json::from_str(&serialized_video)
+            .expect("Failed to deserialize video.json");
+
+        Self { youtube, video, url }
     }
 }
 

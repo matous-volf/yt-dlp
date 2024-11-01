@@ -1,5 +1,6 @@
 //! Formats-related models.
 
+use crate::utils::json_none;
 use serde::{Deserialize, Serialize};
 
 /// Represents an available format of a video.
@@ -51,21 +52,41 @@ pub struct Format {
     /// All the rates-related information.
     #[serde(flatten)]
     pub rates_info: RatesInfo,
-
-    /// The type of the format, computed based on other fields.
-    #[serde(skip)]
-    pub format_type: FormatType,
 }
 
 impl Format {
     /// Checks if the format is a video format.
     pub fn is_video(&self) -> bool {
-        self.format_type.is_video()
+        let format_type = self.format_type();
+
+        format_type.is_video()
     }
 
     /// Checks if the format is an audio format.
     pub fn is_audio(&self) -> bool {
-        self.format_type.is_audio()
+        let format_type = self.format_type();
+
+        format_type.is_audio()
+    }
+
+    pub fn format_type(&self) -> FormatType {
+        if self.download_info.manifest_url.is_some() {
+            return FormatType::Manifest;
+        }
+
+        if self.storyboard_info.fragments.is_some() {
+            return FormatType::Storyboard;
+        }
+
+        let audio = self.codec_info.audio_codec.is_some();
+        let video = self.codec_info.video_codec.is_some();
+
+        match (audio, video) {
+            (true, true) => FormatType::AudioAndVideo,
+            (true, false) => FormatType::Audio,
+            (false, true) => FormatType::Video,
+            _ => FormatType::Unknown,
+        }
     }
 }
 
@@ -73,10 +94,14 @@ impl Format {
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct CodecInfo {
     /// The name of the audio codec, e.g. 'opus' or 'mp4a.xx' (where 'xx' is the codec version).
+    #[serde(default)]
     #[serde(rename = "acodec")]
+    #[serde(deserialize_with = "json_none")]
     pub audio_codec: Option<String>,
     /// The name of the video codec, e.g. 'vp9' or 'avc1.xx' (where 'xx' is the codec version).
+    #[serde(default)]
     #[serde(rename = "vcodec")]
+    #[serde(deserialize_with = "json_none")]
     pub video_codec: Option<String>,
     /// The extension of the audio file.
     #[serde(default)]
@@ -212,6 +237,8 @@ pub enum Extension {
     /// The MHTML extension.
     Mhtml,
 
+    /// If there is no extension.
+    None,
     /// An unknown extension.
     #[default]
     #[serde(other)]
@@ -291,37 +318,19 @@ pub enum FormatType {
 }
 
 impl FormatType {
-    /// Fetches the type of the format.
-    pub fn fetch_type(format: &mut Format) {
-        if format.download_info.manifest_url.is_some() {
-            format.format_type = FormatType::Manifest;
-            return;
-        }
-
-        if format.storyboard_info.fragments.is_some() {
-            format.format_type = FormatType::Storyboard;
-            return;
-        }
-
-        let audio = format.codec_info.audio_codec.is_some();
-        let video = format.codec_info.video_codec.is_some();
-
-        format.format_type = match (audio, video) {
-            (true, true) => FormatType::AudioAndVideo,
-            (true, false) => FormatType::Audio,
-            (false, true) => FormatType::Video,
-            _ => FormatType::Unknown,
-        };
+    /// Checks if the format is an audio and video format.
+    pub fn is_audio_and_video(&self) -> bool {
+        matches!(self, FormatType::AudioAndVideo)
     }
 
     /// Checks if the format is a video format.
     pub fn is_video(&self) -> bool {
-        matches!(self, FormatType::Video | FormatType::AudioAndVideo)
+        matches!(self, FormatType::Video)
     }
 
     /// Checks if the format is an audio format.
     pub fn is_audio(&self) -> bool {
-        matches!(self, FormatType::Audio | FormatType::AudioAndVideo)
+        matches!(self, FormatType::Audio)
     }
 
     /// Checks if the format is a storyboard format.

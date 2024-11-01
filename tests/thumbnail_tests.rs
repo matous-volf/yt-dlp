@@ -6,11 +6,7 @@ pub mod setup;
 #[tokio::test]
 pub async fn video_thumbnail_test() {
     let mut fetcher = SHARED_SETUP.youtube.clone();
-
-    let video = fetcher
-        .fetch_infos()
-        .await
-        .expect("Failed to fetch video infos");
+    let video = SHARED_SETUP.video.clone();
 
     let file_name = format!("{}.jpg", video.title);
     fetcher
@@ -26,6 +22,7 @@ pub async fn video_thumbnail_test() {
     let file_size = std::fs::metadata(&path)
         .expect("Failed to get file metadata")
         .len();
+
     assert!(file_size > 0);
 
     std::fs::remove_file(&path).expect("Failed to remove file");

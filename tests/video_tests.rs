@@ -4,13 +4,8 @@ pub mod setup;
 
 #[cfg(test)]
 #[tokio::test]
-pub async fn video_fetching_test() {
-    let mut fetcher = SHARED_SETUP.youtube.clone();
-
-    let video = fetcher
-        .fetch_infos()
-        .await
-        .expect("Failed to fetch video infos");
+pub async fn video_infos_test() {
+    let video = SHARED_SETUP.video.clone();
 
     assert_eq!(video.id, "dQw4w9WgXcQ");
     assert_eq!(video.title, "Rick Astley - Never Gonna Give You Up (Video)");
@@ -20,11 +15,7 @@ pub async fn video_fetching_test() {
 #[tokio::test]
 pub async fn video_format_downloading_test() {
     let mut fetcher = SHARED_SETUP.youtube.clone();
-
-    let video = fetcher
-        .fetch_infos()
-        .await
-        .expect("Failed to fetch video infos");
+    let video = SHARED_SETUP.video.clone();
 
     let file_name = format!("{}.mp4", video.title);
     let worst_format = video
@@ -57,11 +48,7 @@ pub async fn video_format_downloading_test() {
 #[tokio::test]
 pub async fn audio_format_downloading_test() {
     let mut fetcher = SHARED_SETUP.youtube.clone();
-
-    let video = fetcher
-        .fetch_infos()
-        .await
-        .expect("Failed to fetch video infos");
+    let video = SHARED_SETUP.video.clone();
 
     let file_name = format!("{}.mp3", video.title);
     let worst_audio = video

@@ -182,7 +182,7 @@
 
 use crate::error::{Error, Result};
 use crate::fetcher::{FFmpeg, Fetcher, GitHubFetcher};
-use crate::model::format::{Format, FormatType};
+use crate::model::format::Format;
 use crate::model::Video;
 use crate::utils::file_system;
 use derive_more::Display;
@@ -572,11 +572,7 @@ impl Youtube {
         };
 
         let output = executor.execute().await?;
-        let mut video: Video = serde_json::from_str(&output.stdout).map_err(Error::Serde)?;
-
-        video.formats.iter_mut().for_each(|format| {
-            FormatType::fetch_type(format);
-        });
+        let video: Video = serde_json::from_str(&output.stdout).map_err(Error::Serde)?;
 
         self.video = Some(video.clone());
         Ok(video)

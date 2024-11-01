@@ -6,11 +6,7 @@ pub mod setup;
 #[tokio::test]
 pub async fn video_combining_test() {
     let mut fetcher = SHARED_SETUP.youtube.clone();
-
-    let video = fetcher
-        .fetch_infos()
-        .await
-        .expect("Failed to fetch video infos");
+    let video = SHARED_SETUP.video.clone();
 
     let video_file_name = format!("{}.mp4", video.title);
     let audio_file_name = format!("{}.mp3", video.title);

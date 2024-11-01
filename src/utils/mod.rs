@@ -4,6 +4,7 @@
 
 use crate::error::Result;
 use crate::fetcher::platform::Platform;
+use serde::{Deserialize, Deserializer};
 use tokio::task::JoinHandle;
 
 pub mod executor;
@@ -57,4 +58,17 @@ where
     let results = futures_util::future::try_join_all(handles).await?;
 
     results.into_iter().collect()
+}
+
+/// Fix issue with 'none' string in JSON.
+pub fn json_none<'de, D>(deserializer: D) -> std::result::Result<Option<String>, D::Error>
+where
+    D: Deserializer<'de>,
+{
+    let string: Option<String> = Option::deserialize(deserializer)?;
+
+    match string.as_deref() {
+        Some("none") => Ok(None),
+        _ => Ok(string),
+    }
 }
