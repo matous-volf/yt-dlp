@@ -1,5 +1,6 @@
 .idea/
 yt-dlp.iml
 
+Cargo.lock
 target/
 temp/
