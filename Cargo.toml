@@ -16,7 +16,9 @@ categories = ["api-bindings", "asynchronous", "development-tools"]
 keywords = ["youtube", "yt-dlp", "async", "downloader"]
 
 [workspace.metadata.release]
+shared-version = true
 tag-message = "🔖 v{{version}}"
+pre-release-commit-message = "🚧 v{{version}}"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
