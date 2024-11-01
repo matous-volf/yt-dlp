@@ -47,7 +47,7 @@ use yt_dlp::Youtube;
 use std::path::PathBuf;
 
 #[tokio::main]
-pub async fn main() {
+pub async fn main() -> std::result::Result<(), Box<dyn std::error::Error>> {
     let destination = PathBuf::from("bin");
     let output_dir = PathBuf::from("output");
     let url = "https://www.youtube.com/watch?v=dQw4w9WgXcQ".to_string();
@@ -62,7 +62,7 @@ use yt_dlp::Youtube;
 use std::path::PathBuf;
 
 #[tokio::main]
-pub async fn main() {
+pub async fn main() -> std::result::Result<(), Box<dyn std::error::Error>> {
     let destination = PathBuf::from("bin");
     Youtube::install_youtube(destination).await.expect("Failed to install yt-dlp");
 }
@@ -74,7 +74,7 @@ use yt_dlp::Youtube;
 use std::path::PathBuf;
 
 #[tokio::main]
-pub async fn main() {
+pub async fn main() -> std::result::Result<(), Box<dyn std::error::Error>> {
     let destination = PathBuf::from("bin");
     Youtube::install_ffmpeg(destination).await.expect("Failed to install ffmpeg");
 }
@@ -86,7 +86,7 @@ use yt_dlp::Youtube;
 use std::path::PathBuf;
 
 #[tokio::main]
-pub async fn main() {
+pub async fn main() -> std::result::Result<(), Box<dyn std::error::Error>> {
     let ffmpeg = PathBuf::from("ffmpeg");
     let executable = PathBuf::from("yt-dlp");
     let output_dir = PathBuf::from("output");
@@ -103,7 +103,7 @@ use yt_dlp::Youtube;
 use std::path::PathBuf;
 
 #[tokio::main]
-pub async fn main() {
+pub async fn main() -> std::result::Result<(), Box<dyn std::error::Error>> {
     let ffmpeg = PathBuf::from("ffmpeg");
     let executable = PathBuf::from("yt-dlp");
     let output_dir = PathBuf::from("output");
@@ -124,7 +124,7 @@ use yt_dlp::Youtube;
 use std::path::PathBuf;
 
 #[tokio::main]
-pub async fn main() {
+pub async fn main() -> std::result::Result<(), Box<dyn std::error::Error>> {
     let ffmpeg = PathBuf::from("ffmpeg");
     let executable = PathBuf::from("yt-dlp");
     let output_dir = PathBuf::from("output");
@@ -145,7 +145,7 @@ use yt_dlp::Youtube;
 use std::path::PathBuf;
 
 #[tokio::main]
-pub async fn main() {
+pub async fn main() -> std::result::Result<(), Box<dyn std::error::Error>> {
     let ffmpeg = PathBuf::from("ffmpeg");
     let executable = PathBuf::from("yt-dlp");
     let output_dir = PathBuf::from("output");
@@ -166,7 +166,7 @@ use yt_dlp::Youtube;
 use std::path::PathBuf;
 
 #[tokio::main]
-pub async fn main() {
+pub async fn main() -> std::result::Result<(), Box<dyn std::error::Error>> {
     let ffmpeg = PathBuf::from("ffmpeg");
     let executable = PathBuf::from("yt-dlp");
     let output_dir = PathBuf::from("output");
@@ -188,7 +188,7 @@ use yt_dlp::Youtube;
 use std::path::PathBuf;
 
 #[tokio::main]
-pub async fn main() {
+pub async fn main() -> std::result::Result<(), Box<dyn std::error::Error>> {
     let ffmpeg = PathBuf::from("ffmpeg");
     let executable = PathBuf::from("yt-dlp");
     let output_dir = PathBuf::from("output");
@@ -212,7 +212,7 @@ use yt_dlp::Youtube;
 use std::path::PathBuf;
 
 #[tokio::main]
-pub async fn main() {
+pub async fn main() -> std::result::Result<(), Box<dyn std::error::Error>> {
     let ffmpeg = PathBuf::from("ffmpeg");
     let executable = PathBuf::from("yt-dlp");
     let output_dir = PathBuf::from("output");

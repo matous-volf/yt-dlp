@@ -15,7 +15,7 @@ use tokio::io::AsyncReadExt;
 /// # use std::time::Duration;
 /// # use yt_dlp::utils::executor::Executor;
 /// # #[tokio::main]
-/// # async fn main() {
+/// # async fn main() -> Result<(), Box<dyn std::error::Error>> {
 /// let args = vec!["--update"];
 ///
 /// let executor = Executor {
@@ -24,8 +24,10 @@ use tokio::io::AsyncReadExt;
 ///     args: utils::to_owned(args),
 /// };
 ///
-/// let output = executor.execute().await.expect("Failed to execute command");
+/// let output = executor.execute().await?;
 /// println!("Output: {}", output.stdout);
+///
+/// # Ok(())
 /// # }
 #[derive(Debug, Clone, PartialEq)]
 pub struct Executor {

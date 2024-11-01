@@ -24,13 +24,13 @@ pub mod platform;
 /// # use yt_dlp::fetcher::Fetcher;
 /// # use std::path::PathBuf;
 /// # #[tokio::main]
-/// # async fn main() {
-///
+/// # async fn main() -> Result<(), Box<dyn std::error::Error>> {
 /// let url = "https://example.com/file.txt";
 /// let destination = PathBuf::from("file.txt");
 ///
 /// let fetcher = Fetcher::new(url);
-/// fetcher.fetch_asset(destination).await.expect("Failed to download asset");
+/// fetcher.fetch_asset(destination).await?;
+/// # Ok(())
 /// # }
 /// ```
 #[derive(Debug, Display)]
@@ -122,13 +122,13 @@ impl Fetcher {
 /// # use std::path::PathBuf;
 /// # use yt_dlp::fetcher::GitHubFetcher;
 /// # #[tokio::main]
-/// # async fn main() {
-///
+/// # async fn main() -> Result<(), Box<dyn std::error::Error>> {
 /// let fetcher = GitHubFetcher::new("yt-dlp", "yt-dlp");
 /// let release = fetcher.fetch_release(None).await?;
 ///
 /// let destination = PathBuf::from("yt-dlp");
 /// release.download(destination).await?;
+/// # Ok(())
 /// # }
 #[derive(Debug, Display)]
 #[display("GitHub Fetcher: {}/{}", owner, repo)]
@@ -263,15 +263,15 @@ impl GitHubFetcher {
 /// # use yt_dlp::fetcher::FFmpeg;
 /// # use std::path::PathBuf;
 /// # #[tokio::main]
-/// # async fn main() {
-///
+/// # async fn main() -> Result<(), Box<dyn std::error::Error>> {
 /// let path = PathBuf::from("ffmpeg-release.zip");
 /// let fetcher = FFmpeg::new();
 ///
 /// let release = fetcher.fetch_binary().await?;
-/// release.download(path).await?;
+/// release.download(path.clone()).await?;
 ///
 /// fetcher.extract_binary(path).await?;
+/// # Ok(())
 /// # }
 /// ```
 #[derive(Clone, Debug, Default, Display)]

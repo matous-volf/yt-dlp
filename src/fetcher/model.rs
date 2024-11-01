@@ -55,7 +55,7 @@ impl WantedRelease {
     /// # use std::path::PathBuf;
     ///
     /// # #[tokio::main]
-    /// # async fn main() {
+    /// # async fn main() -> Result<(), Box<dyn std::error::Error>> {
     ///
     /// let release = WantedRelease {
     ///     asset_name: "yt-dlp".to_string(),
@@ -63,7 +63,8 @@ impl WantedRelease {
     /// };
     ///
     /// let destination = PathBuf::from("yt-dlp");
-    /// release.download(destination).await.expect("Failed to download release");
+    /// release.download(destination).await?;
+    /// # Ok(())
     /// # }
     pub async fn download(&self, destination: PathBuf) -> Result<()> {
         let fetcher = Fetcher::new(&self.asset_url);

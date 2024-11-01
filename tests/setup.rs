@@ -27,13 +27,15 @@ impl SharedSetup {
         let executable_file = utils::fetch_executable("yt-dlp");
         let executable_path = destination.join(&executable_file);
 
+        std::fs::create_dir_all(&output_dir).expect("Failed to create output directory");
+
         let youtube = Youtube::new(executable_path, ffmpeg_path, url.clone(), output_dir)
             .expect("Failed to create YouTube instance");
 
         let serialized_video = std::fs::read_to_string("tests/data/video_infos.json")
-            .expect("Failed to read video.json");
+            .expect("Failed to read video_infos.json");
         let video: Video =
-            serde_json::from_str(&serialized_video).expect("Failed to deserialize video.json");
+            serde_json::from_str(&serialized_video).expect("Failed to deserialize video_infos.json");
 
         Self {
             youtube,
@@ -50,6 +52,7 @@ impl Drop for SharedSetup {
         let _ = std::fs::remove_file(&self.youtube.ffmpeg_path);
 
         let _ = std::fs::remove_dir_all(&self.youtube.output_dir);
+        let _ = std::fs::remove_dir_all("temp");
     }
 }
 
