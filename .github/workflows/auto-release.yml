@@ -29,6 +29,13 @@ jobs:
       - name: 📌 Install cargo-release
         run: cargo install cargo-release
 
+      - name: ✅ Commit Cargo.lock changes
+        run: |
+          git config user.name "GitHub Actions"
+          git config user.email "actions@github.com"
+          git add Cargo.lock
+          git commit -m "🔐 Update Cargo.lock" || echo "No changes to commit"
+
       - name: 🚀 Create a new patch release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
