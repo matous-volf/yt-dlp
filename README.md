@@ -49,7 +49,9 @@
 
 ---
 
-<div align="center">🚧 Few stats and tools scores about the project: </div>
+<p align="center">
+    🚧 Few stats and tools scores about the project: 
+</p>
 <p align="center">
   <a href="https://scorecard.dev/viewer/?uri=github.com/boul2gom/yt-dlp">
     <img src="https://img.shields.io/ossf-scorecard/github.com/boul2gom/yt-dlp?label=Scorecard&logo=SecurityScorecard" alt="OpenSSF Scorecard"/>
