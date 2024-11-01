@@ -1,8 +1,9 @@
-name: Github CI - Automatic Biweekly Release
+name: Github CI - Automatic biweekly release
 
 on:
   schedule:
     - cron: '0 0 1,15 * *'
+  workflow_dispatch:
 
 jobs:
   create_release:

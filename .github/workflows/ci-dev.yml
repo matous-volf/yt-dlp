@@ -3,6 +3,7 @@ name: Github CI - Development
 on:
   push:
     branches: [ develop, master ]
+  workflow_dispatch:
 
 jobs:
   setup-and-build:
