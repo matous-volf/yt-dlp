@@ -19,15 +19,43 @@
 ---
 
 <p align="center">
-  <img src="https://img.shields.io/github/actions/workflow/status/boul2gom/yt-dlp/ci-dev.yml?label=Develop%20CI&logo=Github" alt="Develop CI"/>
-  <img src="https://img.shields.io/github/v/release/boul2gom/yt-dlp?label=Release&logo=Github" alt="Release"/>
-  <img src="https://img.shields.io/github/license/boul2gom/yt-dlp?label=License&logo=Github" alt="License">
+  <a href="https://github.com/boul2gom/yt-dlp/actions/workflows/ci-dev.yml">
+    <img src="https://img.shields.io/github/actions/workflow/status/boul2gom/yt-dlp/ci-dev.yml?label=Develop%20CI&logo=Github" alt="Develop CI"/>
+  </a>  
+  <a href="https://crates.io/crates/yt-dlp">
+    <img src="https://img.shields.io/github/v/release/boul2gom/yt-dlp?label=Release&logo=Rust" alt="Release"/>
+  </a>
+  <a href="https://github.com/boul2gom/yt-dlp/blob/develop/LICENSE.md">
+    <img src="https://img.shields.io/github/license/boul2gom/yt-dlp?label=License&logo=Github" alt="License">
+  </a>
+</p>
 <p align="center">
-  <img src="https://img.shields.io/github/discussions/boul2gom/yt-dlp?label=Discussions&logo=Github" alt="Discussions">
-  <img src="https://img.shields.io/github/issues-raw/boul2gom/yt-dlp?label=Issues&logo=Github" alt="Issues">
-  <img src="https://img.shields.io/github/issues-pr-raw/boul2gom/yt-dlp?label=Pull requests&logo=Github" alt="Pull requests">
-  <img src="https://img.shields.io/github/stars/boul2gom/yt-dlp?label=Stars&logo=Github" alt="Stars">
-  <img src="https://img.shields.io/github/forks/boul2gom/yt-dlp?label=Forks&logo=Github" alt="Forks">
+  <a href="https://github.com/boul2gom/yt-dlp/discussions">
+    <img src="https://img.shields.io/github/discussions/boul2gom/yt-dlp?label=Discussions&logo=Github" alt="Discussions">
+  </a>
+  <a href="https://github.com/boul2gom/yt-dlp/issues">
+    <img src="https://img.shields.io/github/issues-raw/boul2gom/yt-dlp?label=Issues&logo=Github" alt="Issues">
+  </a>
+  <a href="https://github.com/boul2gom/yt-dlp/pulls">
+    <img src="https://img.shields.io/github/issues-pr-raw/boul2gom/yt-dlp?label=Pull requests&logo=Github" alt="Pull requests">
+  </a>
+  <a href="https://github.com/boul2gom/yt-dlp/stargazers">
+    <img src="https://img.shields.io/github/stars/boul2gom/yt-dlp?label=Stars&logo=Github" alt="Stars">
+  </a>
+  <a href="https://github.com/boul2gom/yt-dlp/fork">
+    <img src="https://img.shields.io/github/forks/boul2gom/yt-dlp?label=Forks&logo=Github" alt="Forks">
+  </a>
+</p>
+<p align="center">
+  <a href="https://scorecard.dev/viewer/?uri=github.com/boul2gom/yt-dlp">
+    <img src="https://img.shields.io/ossf-scorecard/github.com/boul2gom/yt-dlp?label=Scorecard&logo=SecurityScorecard" alt="OpenSSF Scorecard"/>
+  </a>
+  <a href="https://crates.io/crates/yt-dlp">
+    <img src="https://img.shields.io/crates/d/yt-dlp?label=Downloads&logo=Rust" alt="Downloads"/>
+  </a>
+  <a href="https://docs.rs/yt-dlp">
+    <img src="https://img.shields.io/sonar/tech_debt/boul2gom%3Ayt-dlp?server=https%3A%2F%2Fsonarcloud.io&label=Tech%20Debt&logo=SonarCloud" alt="Tech Debt"/>
+  </a>
 </p>
 
 ---
