@@ -15,6 +15,9 @@ repository = "https://github.com/boul2gom/yt-dlp"
 categories = ["api-bindings", "asynchronous", "development-tools"]
 keywords = ["youtube", "yt-dlp", "async", "downloader"]
 
+[workspace.metadata.release]
+tag-message = "🔖 v{{version}}"
+
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
