@@ -34,8 +34,8 @@ impl SharedSetup {
 
         let serialized_video = std::fs::read_to_string("tests/data/video_infos.json")
             .expect("Failed to read video_infos.json");
-        let video: Video =
-            serde_json::from_str(&serialized_video).expect("Failed to deserialize video_infos.json");
+        let video: Video = serde_json::from_str(&serialized_video)
+            .expect("Failed to deserialize video_infos.json");
 
         Self {
             youtube,

@@ -8,7 +8,10 @@ pub async fn video_infos_test() {
     let video = SHARED_SETUP.video.clone();
 
     assert_eq!(video.id, "dQw4w9WgXcQ");
-    assert_eq!(video.title, "Rick Astley - Never Gonna Give You Up (Official Music Video)");
+    assert_eq!(
+        video.title,
+        "Rick Astley - Never Gonna Give You Up (Official Music Video)"
+    );
 }
 
 #[cfg(test)]
@@ -97,10 +100,10 @@ pub async fn worst_formats_combining_test() {
         .await
         .expect("Failed to download video format");
 
-
-    let output_path = fetcher.combine_audio_and_video("audio.mp3",
-                                                      "video.mp4",
-                                                      "output.mp4").await.expect("Failed to combine audio and video");
+    let output_path = fetcher
+        .combine_audio_and_video("audio.mp3", "video.mp4", "output.mp4")
+        .await
+        .expect("Failed to combine audio and video");
 
     assert!(output_path.exists());
     assert_eq!(output_path.extension().unwrap(), "mp4");
