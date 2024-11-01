@@ -8,12 +8,13 @@ on:
     types: [ opened, synchronize, reopened ]
   workflow_dispatch:
 
+permissions:
+  contents: read
+
 jobs:
   setup-and-build:
     name: Setup and build
     runs-on: ubuntu-latest
-    permissions:
-      contents: read
 
     steps:
       - name: 📁 Check out the repository
@@ -52,8 +53,6 @@ jobs:
     name: SonarCloud analysis
     needs: setup-and-build
     runs-on: ubuntu-latest
-    permissions:
-      contents: read
 
     steps:
       - name: 📁 Check out the repository
@@ -72,7 +71,6 @@ jobs:
     permissions:
       security-events: write
       id-token: write
-      contents: read
 
     steps:
       - name: 📁 Check out the repository
