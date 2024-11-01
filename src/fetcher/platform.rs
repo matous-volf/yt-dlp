@@ -11,7 +11,7 @@ pub enum Platform {
     /// The Linux operating system.
     #[display("Linux")]
     Linux,
-    /// The MacOS operating system.
+    /// The macOS operating system.
     #[display("MacOS")]
     Mac,
 
@@ -43,8 +43,12 @@ pub enum Architecture {
 
 impl Platform {
     /// Detects the current platform where the program is running.
+    #[cfg_attr(feature = "tracing", instrument(level = "debug", skip(self)))]
     pub fn detect() -> Self {
         let os = std::env::consts::OS;
+
+        #[cfg(feature = "tracing")]
+        tracing::debug!("Detected platform: {}", os);
 
         match os {
             "windows" => Platform::Windows,
@@ -57,8 +61,12 @@ impl Platform {
 
 impl Architecture {
     /// Detects the current architecture of the CPU where the program is running.
+    #[cfg_attr(feature = "tracing", instrument(level = "debug", skip(self)))]
     pub fn detect() -> Self {
         let arch = std::env::consts::ARCH;
+
+        #[cfg(feature = "tracing")]
+        tracing::debug!("Detected architecture: {}", arch);
 
         match arch {
             "x86_64" => Architecture::X64,

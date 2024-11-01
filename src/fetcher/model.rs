@@ -53,10 +53,8 @@ impl WantedRelease {
     /// ```rust, no_run
     /// # use yt_dlp::fetcher::model::WantedRelease;
     /// # use std::path::PathBuf;
-    ///
     /// # #[tokio::main]
     /// # async fn main() -> Result<(), Box<dyn std::error::Error>> {
-    ///
     /// let release = WantedRelease {
     ///     asset_name: "yt-dlp".to_string(),
     ///     asset_url: "https://github.com/yt-dlp/yt-dlp/releases/download/2024.10.22/yt-dlp".to_string(),
@@ -66,7 +64,15 @@ impl WantedRelease {
     /// release.download(destination).await?;
     /// # Ok(())
     /// # }
+    #[cfg_attr(feature = "tracing", instrument(level = "debug", skip(self)))]
     pub async fn download(&self, destination: PathBuf) -> Result<()> {
+        #[cfg(feature = "tracing")]
+        tracing::debug!(
+            "Downloading asset: {} to {}",
+            self.asset_name,
+            destination.display()
+        );
+
         let fetcher = Fetcher::new(&self.asset_url);
         fetcher.fetch_asset(destination).await
     }

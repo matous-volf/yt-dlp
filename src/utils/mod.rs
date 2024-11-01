@@ -15,8 +15,8 @@ pub fn to_owned(vec: Vec<&str>) -> Vec<String> {
     vec.into_iter().map(|s| s.to_owned()).collect()
 }
 
-/// Fetches the name of the executable for the given platform.
-pub fn fetch_executable(name: &str) -> String {
+/// Find the name of the executable for the given platform.
+pub fn find_executable(name: &str) -> String {
     let platform = Platform::detect();
 
     match platform {
@@ -32,6 +32,7 @@ pub fn fetch_executable(name: &str) -> String {
 ///
 /// * `first` - The first future to await.
 /// * `second` - The second future to await.
+#[cfg_attr(feature = "tracing", instrument(level = "debug"))]
 pub async fn await_two<T>(
     first: JoinHandle<Result<T>>,
     second: JoinHandle<Result<T>>,
@@ -50,6 +51,7 @@ pub async fn await_two<T>(
 /// # Arguments
 ///
 /// * `handles` - The futures to await.
+#[cfg_attr(feature = "tracing", instrument(level = "debug"))]
 pub async fn await_all<T, I>(handles: I) -> Result<Vec<T>>
 where
     I: IntoIterator<Item = JoinHandle<Result<T>>>,
@@ -71,4 +73,15 @@ where
         Some("none") => Ok(None),
         _ => Ok(string),
     }
+}
+
+#[macro_export]
+macro_rules! ternary {
+    ($condition:expr, $true:expr, $false:expr) => {
+        if $condition {
+            $true
+        } else {
+            $false
+        }
+    };
 }

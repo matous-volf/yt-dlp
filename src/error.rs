@@ -28,8 +28,8 @@ pub enum Error {
     /// An error occurred while interacting with GitHub.
     #[error("No GitHub asset found for platform {0}/{1}")]
     Github(Platform, Architecture),
-    /// An error occurred while interacting with FFmpeg.
-    #[error("No FFmpeg binary found for platform {0}/{1}")]
+    /// An error occurred while interacting with ffmpeg.
+    #[error("No ffmpeg binary found for platform {0}/{1}")]
     Binary(Platform, Architecture),
     /// An error occurred while running a command.
     #[error("Failed to execute command: {0}")]

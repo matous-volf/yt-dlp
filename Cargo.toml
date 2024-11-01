@@ -1,7 +1,7 @@
 [package]
 name = "yt-dlp"
 edition = "2021"
-version = "1.1.4"
+version = "1.2.0"
 
 authors = ["boul2gom <contact@boul2gom.fr>"]
 description = "⚙️ A Rust library (with auto dependencies downloading) for yt-dlp 🎬️"
@@ -22,22 +22,30 @@ pre-release-commit-message = "🚧 v{{version}}"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
+[features]
+default = []
+tracing = ["dep:tracing"]
+
 [dependencies]
+# Runtime and async dependencies
 tokio = { version = "1.41.0", features = ["rt-multi-thread", "macros", "fs", "time", "process"] }
 reqwest = { version = "0.12.9", features = ["json", "stream"] }
 futures-util = "0.3.31"
 
+# Serialization dependencies
 serde = { version = "1.0.214", features = ["derive"] }
 serde_json = "1.0.132"
 
-derive_more = { version = "1.0.0", features = ["display"] }
+# Error handling dependencies
+derive_more = { version = "1.0.0", features = ["display", "constructor"] }
 thiserror = "1.0.66"
 
+# Misc and compression dependencies
 ordered-float = "4.4.0"
 flate2 = "1.0.34"
 tar = "0.4.42"
 zip = "2.2.0"
 xz2 = "0.1.7"
 
-[dev-dependencies]
-lazy_static = "1.5.0"
+# Logging dependencies
+tracing = { version = "0.1.40", optional = true }

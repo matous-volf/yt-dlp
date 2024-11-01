@@ -32,14 +32,28 @@
 
 ---
 
-# 📥 How to get it
+## 📥 How to get it
+
 Add the following to your `Cargo.toml` file:
 ```toml
 [dependencies]
 yt-dlp = "latest version of the crate"
 ```
 
-# 📚 Examples
+## 🔌 Available features
+
+- `tracing` (disabled by default): Enables the tracing feature for debugging.
+You can enable it by adding the following to your `Cargo.toml` file:
+```toml
+[dependencies]
+yt-dlp = { version = "latest version of the crate", features = ["tracing"] }
+```
+
+## 📖 Documentation
+
+The documentation is available on [docs.rs](https://docs.rs/yt-dlp).
+
+## 📚 Examples
 
 - 📦 Installing the [yt-dlp](https://github.com/yt-dlp/yt-dlp/) and [ffmpeg](https://ffmpeg.org/) binaries:
 ```rust
@@ -47,36 +61,42 @@ use yt_dlp::Youtube;
 use std::path::PathBuf;
 
 #[tokio::main]
-pub async fn main() -> std::result::Result<(), Box<dyn std::error::Error>> {
-    let destination = PathBuf::from("bin");
+pub async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    let executables_dir = PathBuf::from("libs");
     let output_dir = PathBuf::from("output");
-    let url = "https://www.youtube.com/watch?v=dQw4w9WgXcQ".to_string();
 
-    let fetcher = Youtube::new_with_binaries(destination, url, output_dir).await.expect("Failed to install binaries");
+    let fetcher = Youtube::with_new_binaries(executables_dir, output_dir).await?;
+    Ok(())
 }
 ```
 
 - 📦 Installing the yt-dlp binary only:
 ```rust
-use yt_dlp::Youtube;
+use yt_dlp::fetcher::deps::LibraryInstaller;
 use std::path::PathBuf;
 
 #[tokio::main]
-pub async fn main() -> std::result::Result<(), Box<dyn std::error::Error>> {
-    let destination = PathBuf::from("bin");
-    Youtube::install_youtube(destination).await.expect("Failed to install yt-dlp");
+pub async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    let destination = PathBuf::from("libs");
+    let installer = LibraryInstaller::new(destination);
+
+    let youtube = installer.install_youtube(None).await.unwrap();
+    Ok(())
 }
 ```
 
 - 📦 Installing the ffmpeg binary only:
 ```rust
-use yt_dlp::Youtube;
+use yt_dlp::fetcher::deps::LibraryInstaller;
 use std::path::PathBuf;
 
 #[tokio::main]
-pub async fn main() -> std::result::Result<(), Box<dyn std::error::Error>> {
-    let destination = PathBuf::from("bin");
-    Youtube::install_ffmpeg(destination).await.expect("Failed to install ffmpeg");
+pub async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    let destination = PathBuf::from("libs");
+    let installer = LibraryInstaller::new(destination);
+    
+    let ffmpeg = installer.install_ffmpeg(None).await.unwrap();
+    Ok(())
 }
 ```
 
@@ -84,16 +104,21 @@ pub async fn main() -> std::result::Result<(), Box<dyn std::error::Error>> {
 ```rust
 use yt_dlp::Youtube;
 use std::path::PathBuf;
+use yt_dlp::fetcher::deps::Libraries;
 
 #[tokio::main]
-pub async fn main() -> std::result::Result<(), Box<dyn std::error::Error>> {
-    let ffmpeg = PathBuf::from("ffmpeg");
-    let executable = PathBuf::from("yt-dlp");
+pub async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    let libraries_dir = PathBuf::from("libs");
     let output_dir = PathBuf::from("output");
-    let url = "https://www.youtube.com/watch?v=dQw4w9WgXcQ".to_string();
+    
+    let youtube = libraries_dir.join("yt-dlp");
+    let ffmpeg = libraries_dir.join("ffmpeg");
+    
+    let libraries = Libraries::new(youtube, ffmpeg);
+    let fetcher = Youtube::new(libraries, output_dir)?;
 
-    let mut fetcher = Youtube::new(executable, ffmpeg, url, output_dir).expect("Failed to create fetcher");
-    fetcher.update_downloader().await.expect("Failed to update yt-dlp");
+    fetcher.update_downloader().await?;
+    Ok(())
 }
 ```
 
@@ -101,20 +126,22 @@ pub async fn main() -> std::result::Result<(), Box<dyn std::error::Error>> {
 ```rust
 use yt_dlp::Youtube;
 use std::path::PathBuf;
+use yt_dlp::fetcher::deps::Libraries;
 
 #[tokio::main]
-pub async fn main() -> std::result::Result<(), Box<dyn std::error::Error>> {
-    let ffmpeg = PathBuf::from("ffmpeg");
-    let executable = PathBuf::from("yt-dlp");
+pub async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    let libraries_dir = PathBuf::from("libs");
     let output_dir = PathBuf::from("output");
-    let url = "https://www.youtube.com/watch?v=dQw4w9WgXcQ".to_string();
+    
+    let youtube = libraries_dir.join("yt-dlp");
+    let ffmpeg = libraries_dir.join("ffmpeg");
+    
+    let libraries = Libraries::new(youtube, ffmpeg);
+    let fetcher = Youtube::new(libraries, output_dir)?;
 
-    let mut fetcher = Youtube::new(executable, ffmpeg, url, output_dir).expect("Failed to create fetcher");
-
-    let video = fetcher.fetch_infos().await.expect("Failed to fetch video infos");
-    println!("Video title: {}", video.title);
-
-    fetcher.download_video("video.mp4").await.expect("Failed to download video");
+    let url = String::from("https://www.youtube.com/watch?v=dQw4w9WgXcQ");
+    let video_path = fetcher.download_video_from_url(url, "my-video.mp4").await?;
+    Ok(())
 }
 ```
 
@@ -122,20 +149,22 @@ pub async fn main() -> std::result::Result<(), Box<dyn std::error::Error>> {
 ```rust
 use yt_dlp::Youtube;
 use std::path::PathBuf;
+use yt_dlp::fetcher::deps::Libraries;
 
 #[tokio::main]
-pub async fn main() -> std::result::Result<(), Box<dyn std::error::Error>> {
-    let ffmpeg = PathBuf::from("ffmpeg");
-    let executable = PathBuf::from("yt-dlp");
+pub async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    let libraries_dir = PathBuf::from("libs");
     let output_dir = PathBuf::from("output");
-    let url = "https://www.youtube.com/watch?v=dQw4w9WgXcQ".to_string();
 
-    let mut fetcher = Youtube::new(executable, ffmpeg, url, output_dir).expect("Failed to create fetcher");
+    let youtube = libraries_dir.join("yt-dlp");
+    let ffmpeg = libraries_dir.join("ffmpeg");
 
-    let video = fetcher.fetch_infos().await.expect("Failed to fetch video infos");
-    println!("Video title: {}", video.title);
-
-    fetcher.download_video_stream("video.mp4").await.expect("Failed to download video without audio");
+    let libraries = Libraries::new(youtube, ffmpeg);
+    let fetcher = Youtube::new(libraries, output_dir)?;
+    
+    let url = String::from("https://www.youtube.com/watch?v=dQw4w9WgXcQ");
+    fetcher.download_video_stream_from_url(url, "video.mp4").await?;
+    Ok(())
 }
 ```
 
@@ -143,20 +172,22 @@ pub async fn main() -> std::result::Result<(), Box<dyn std::error::Error>> {
 ```rust
 use yt_dlp::Youtube;
 use std::path::PathBuf;
+use yt_dlp::fetcher::deps::Libraries;
 
 #[tokio::main]
-pub async fn main() -> std::result::Result<(), Box<dyn std::error::Error>> {
-    let ffmpeg = PathBuf::from("ffmpeg");
-    let executable = PathBuf::from("yt-dlp");
+pub async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    let libraries_dir = PathBuf::from("libs");
     let output_dir = PathBuf::from("output");
-    let url = "https://www.youtube.com/watch?v=dQw4w9WgXcQ".to_string();
 
-    let mut fetcher = Youtube::new(executable, ffmpeg, url, output_dir).expect("Failed to create fetcher");
+    let youtube = libraries_dir.join("yt-dlp");
+    let ffmpeg = libraries_dir.join("ffmpeg");
 
-    let audio = fetcher.fetch_audio_infos().await.expect("Failed to fetch audio infos");
-    println!("Audio title: {}", audio.title);
+    let libraries = Libraries::new(youtube, ffmpeg);
+    let fetcher = Youtube::new(libraries, output_dir)?;
 
-    fetcher.download_audio_stream("audio.mp3").await.expect("Failed to download audio");
+    let url = String::from("https://www.youtube.com/watch?v=dQw4w9WgXcQ");
+    fetcher.download_audio_stream_from_url(url, "audio.mp3").await?;
+    Ok(())
 }
 ```
 
@@ -164,21 +195,30 @@ pub async fn main() -> std::result::Result<(), Box<dyn std::error::Error>> {
 ```rust
 use yt_dlp::Youtube;
 use std::path::PathBuf;
+use yt_dlp::fetcher::deps::Libraries;
 
 #[tokio::main]
-pub async fn main() -> std::result::Result<(), Box<dyn std::error::Error>> {
-    let ffmpeg = PathBuf::from("ffmpeg");
-    let executable = PathBuf::from("yt-dlp");
+pub async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    let libraries_dir = PathBuf::from("libs");
     let output_dir = PathBuf::from("output");
-    let url = "https://www.youtube.com/watch?v=dQw4w9WgXcQ".to_string();
-
-    let mut fetcher = Youtube::new(executable, ffmpeg, url, output_dir).expect("Failed to create fetcher");
-
-    let video = fetcher.fetch_infos().await.expect("Failed to fetch video infos");
+    
+    let youtube = libraries_dir.join("yt-dlp");
+    let ffmpeg = libraries_dir.join("ffmpeg");
+    
+    let libraries = Libraries::new(youtube, ffmpeg);
+    let fetcher = Youtube::new(libraries, output_dir)?;
+    
+    let url = String::from("https://www.youtube.com/watch?v=dQw4w9WgXcQ");
+    let video = fetcher.fetch_video_infos(url).await?;
     println!("Video title: {}", video.title);
 
-    let format = video.best_video_format().unwrap(); // or video.best_audio_format if you want audio
-    fetcher.download_format(&format, "video.mp4").await.expect("Failed to download video format");
+    let video_format = video.best_video_format().unwrap();
+    let format_path = fetcher.download_format(&video_format, "my-video-stream.mp4").await?;
+    
+    let audio_format = video.worst_audio_format().unwrap();
+    let audio_path = fetcher.download_format(&audio_format, "my-audio-stream.mp3").await?;
+    
+    Ok(())
 }
 ```
 
@@ -186,23 +226,30 @@ pub async fn main() -> std::result::Result<(), Box<dyn std::error::Error>> {
 ```rust
 use yt_dlp::Youtube;
 use std::path::PathBuf;
+use yt_dlp::fetcher::deps::Libraries;
 
 #[tokio::main]
-pub async fn main() -> std::result::Result<(), Box<dyn std::error::Error>> {
-    let ffmpeg = PathBuf::from("ffmpeg");
-    let executable = PathBuf::from("yt-dlp");
+pub async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    let libraries_dir = PathBuf::from("libs");
     let output_dir = PathBuf::from("output");
-    let url = "https://www.youtube.com/watch?v=dQw4w9WgXcQ".to_string();
+    
+    let youtube = libraries_dir.join("yt-dlp");
+    let ffmpeg = libraries_dir.join("ffmpeg");
+    
+    let libraries = Libraries::new(youtube, ffmpeg);
+    let fetcher = Youtube::new(libraries, output_dir)?;
 
-    let mut fetcher = Youtube::new(executable, ffmpeg, url, output_dir).expect("Failed to create fetcher");
+    let url = String::from("https://www.youtube.com/watch?v=dQw4w9WgXcQ");
+    let video = fetcher.fetch_video_infos(url).await?;
 
-    let video = fetcher.fetch_infos().await.expect("Failed to fetch video infos");
-    println!("Video title: {}", video.title);
+    let audio_format = video.best_audio_format().unwrap();
+    let audio_path = fetcher.download_format(&audio_format, "audio-stream.mp3").await?;
 
-    fetcher.download_video_stream("video.mp4").await.expect("Failed to download video");
-    fetcher.download_audio_stream("audio.mp3").await.expect("Failed to download audio");
+    let video_format = video.worst_video_format().unwrap();
+    let video_path = fetcher.download_format(&video_format, "video-stream.mp4").await?;
 
-    fetcher.combine_audio_and_video("video.mp4", "audio.mp3", "output.mp4").await.expect("Failed to combine audio and video");
+    let output_path = fetcher.combine_audio_and_video("audio-stream.mp3", "video-stream.mp4", "my-output.mp4").await?;
+    Ok(())
 }
 ```
 
@@ -210,24 +257,26 @@ pub async fn main() -> std::result::Result<(), Box<dyn std::error::Error>> {
 ```rust
 use yt_dlp::Youtube;
 use std::path::PathBuf;
+use yt_dlp::fetcher::deps::Libraries;
 
 #[tokio::main]
-pub async fn main() -> std::result::Result<(), Box<dyn std::error::Error>> {
-    let ffmpeg = PathBuf::from("ffmpeg");
-    let executable = PathBuf::from("yt-dlp");
+pub async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    let libraries_dir = PathBuf::from("libs");
     let output_dir = PathBuf::from("output");
-    let url = "https://www.youtube.com/watch?v=dQw4w9WgXcQ".to_string();
-
-    let mut fetcher = Youtube::new(executable, ffmpeg, url, output_dir).expect("Failed to create fetcher");
-
-    let video = fetcher.fetch_infos().await.expect("Failed to fetch video infos");
-    println!("Video title: {}", video.title);
     
-    fetcher.download_thumbnail("thumbnail.jpg").await.expect("Failed to download thumbnail");
+    let youtube = libraries_dir.join("yt-dlp");
+    let ffmpeg = libraries_dir.join("ffmpeg");
+    
+    let libraries = Libraries::new(youtube, ffmpeg);
+    let fetcher = Youtube::new(libraries, output_dir)?;
+
+    let url = String::from("https://www.youtube.com/watch?v=dQw4w9WgXcQ");
+    let thumbnail_path = fetcher.download_thumbnail_from_url(url, "thumbnail.jpg").await?;
+    Ok(())
 }
 ```
 
-# 💡Support coming soon
+## 💡Support coming soon
 - [ ] Subtitles
 - [ ] Chapters
 - [ ] Heatmap
