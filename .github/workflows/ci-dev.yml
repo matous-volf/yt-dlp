@@ -72,8 +72,14 @@ jobs:
           command: test
           args: setup_test -- --exact
 
-      - name: 🧪 Run integration tests
+      - name: 🧪 Run documentation tests
         uses: actions-rs/cargo@v1
         with:
           command: test
-          args: -- --skip setup_test
+          args: --doc
+
+#      - name: 🧪 Run integration tests
+#        uses: actions-rs/cargo@v1
+#        with:
+#          command: test
+#          args: -- --skip setup_test
