@@ -38,18 +38,18 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           CARGO_REGISTRY_TOKEN: ${{ secrets.CARGO_REGISTRY_TOKEN }}
-        run: cargo release patch --execute --no-confirm
+        run: cargo release patch --execute --no-confirm --tag-message "🔖 v{{version}}"
 
       - name: 🔍 Get new version
         id: get_version
-        run: echo "version=$(cargo metadata --no-deps --format-version 1 | jq -r '.packages[0].version')" >> $GITHUB_OUTPUT
+        run: echo "version=$(cargo metadata --no-deps --format-version 1 | jq -r '.packages[0].version')" >> $GITHUB_ENV
 
       - name: 📝 Create GitHub Release
         uses: actions/create-release@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: v${{ steps.get_version.outputs.version }}
-          release_name: 🔖 v${{ steps.get_version.outputs.version }}
+          tag_name: v${{ env.version }}
+          release_name: 🔖 v${{ env.version }}
           draft: false
           prerelease: false
