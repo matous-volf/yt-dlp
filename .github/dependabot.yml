@@ -11,9 +11,20 @@ updates:
     assignees:
       - "boul2gom"
     commit-message:
-      prefix: "[Rust Crates]"
-      include: "scope"
+      prefix: "[Rust Crates] "
+      subject: "📌 Update {{ package }} to {{ version }}"
+      body: |
+        Bumps the version of {{ package }} from {{ previous_version }} to {{ version }}.
+        
+        This includes the following changes:
+        - {{ changelog_url }}
+        - Update type: {{ update_type }}
     target-branch: "develop"
+
+    security-updates: true
+    rebase-strategy: "auto"
+    auto-merge: true
+    auto-merge-method: "squash"
 
   - package-ecosystem: "github-actions"
     directory: "/"
@@ -26,6 +37,18 @@ updates:
     assignees:
       - "boul2gom"
     commit-message:
-      prefix: "[Github Actions]"
-      include: "scope"
+      prefix: "[Github Actions] "
+      subject: "📌 Update {{ package }} to {{ version }}"
+      body: |
+        Bumps the version of {{ package }} from {{ previous_version }} to {{ version }}.
+        
+        This includes the following changes:
+        - {{ changelog_url }}
+        - Update type: {{ update_type }}
+
     target-branch: "develop"
+
+    security-updates: true
+    rebase-strategy: "auto"
+    auto-merge: true
+    auto-merge-method: "squash"
