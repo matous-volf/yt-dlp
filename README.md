@@ -54,7 +54,7 @@
     <img src="https://img.shields.io/crates/d/yt-dlp?label=Downloads&logo=Rust" alt="Downloads"/>
   </a>
   <a href="https://docs.rs/yt-dlp">
-    <img src="https://img.shields.io/sonar/tech_debt/boul2gom%3Ayt-dlp?server=https%3A%2F%2Fsonarcloud.io&label=Tech%20Debt&logo=SonarCloud" alt="Tech Debt"/>
+    <img src="https://img.shields.io/sonar/tech_debt/boul2gom_yt-dlp?server=https%3A%2F%2Fsonarcloud.io&label=Tech%20Debt&logo=SonarCloud" alt="Tech Debt"/>
   </a>
 </p>
 
