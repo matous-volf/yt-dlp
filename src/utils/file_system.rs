@@ -7,6 +7,7 @@ use tar::Archive;
 use xz2::read::XzDecoder;
 use zip::ZipArchive;
 
+/// Returns the name of the given path.
 pub fn try_name(path: impl AsRef<Path>) -> Result<String> {
     let name = path
         .as_ref()
@@ -19,6 +20,7 @@ pub fn try_name(path: impl AsRef<Path>) -> Result<String> {
     Ok(name.to_string())
 }
 
+/// Returns the name of the given path without the extension.
 pub fn try_without_extension(path: impl AsRef<Path>) -> Result<String> {
     let name = try_name(path)?;
     let name = name
@@ -29,6 +31,7 @@ pub fn try_without_extension(path: impl AsRef<Path>) -> Result<String> {
     Ok(name.to_string())
 }
 
+/// Returns the parent directory of the given path.
 pub fn try_parent(path: impl AsRef<Path>) -> Result<PathBuf> {
     let parent = path
         .as_ref()

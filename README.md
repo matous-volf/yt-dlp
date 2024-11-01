@@ -40,9 +40,12 @@ Add the following to your `Cargo.toml` file:
 yt-dlp = "latest version of the crate"
 ```
 
+A new release is automatically published every two weeks, to keep up to date with dependencies and features.
+Make sure to check the [releases](https://github.com/boul2gom/yt-dlp/releases) page to see the latest version of the crate.
+
 ## 🔌 Available features
 
-### 📝 Profiling with `tracing` (disabled by default):
+#### 📝 Profiling with `tracing` (disabled by default):
 The crate supports the `tracing` feature to enable profiling, which can be useful for debugging.
 You can enable it by adding the following to your `Cargo.toml` file:
 ```toml

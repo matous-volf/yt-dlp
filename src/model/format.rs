@@ -69,6 +69,8 @@ impl Format {
         format_type.is_audio()
     }
 
+    /// Gets the type of the format.
+    /// It can be audio, video, both of them, a manifest, or a storyboard.
     pub fn format_type(&self) -> FormatType {
         if self.download_info.manifest_url.is_some() {
             return FormatType::Manifest;
@@ -297,6 +299,8 @@ pub enum DynamicRange {
     Unknown,
 }
 
+/// The available format types.
+/// It can be audio, video, both of them, a manifest, or a storyboard.
 #[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub enum FormatType {
     /// The format contains only audio.
