@@ -3,4 +3,6 @@ yt-dlp.iml
 
 Cargo.lock
 target/
+
+libs/
 temp/
