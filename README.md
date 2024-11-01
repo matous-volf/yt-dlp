@@ -42,7 +42,8 @@ yt-dlp = "latest version of the crate"
 
 ## 🔌 Available features
 
-- `tracing` (disabled by default): Enables the tracing feature for debugging.
+### 📝 Profiling with `tracing` (disabled by default):
+The crate supports the `tracing` feature to enable profiling, which can be useful for debugging.
 You can enable it by adding the following to your `Cargo.toml` file:
 ```toml
 [dependencies]
