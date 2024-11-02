@@ -92,8 +92,11 @@ impl Youtube {
     /// # Ok(())
     /// # }
     /// ```
-    #[cfg_attr(feature = "tracing", instrument(level = "debug"))]
-    pub fn new(libraries: Libraries, output_dir: impl AsRef<Path>) -> Result<Self> {
+    #[cfg_attr(feature = "tracing", tracing::instrument(level = "debug"))]
+    pub fn new(
+        libraries: Libraries,
+        output_dir: impl AsRef<Path> + std::fmt::Debug,
+    ) -> Result<Self> {
         #[cfg(feature = "tracing")]
         tracing::debug!("Creating a new video fetcher");
 
@@ -134,10 +137,10 @@ impl Youtube {
     /// # Ok(())
     /// # }
     /// ```
-    #[cfg_attr(feature = "tracing", instrument(level = "debug"))]
+    #[cfg_attr(feature = "tracing", tracing::instrument(level = "debug"))]
     pub async fn with_new_binaries(
-        executables_dir: impl AsRef<Path>,
-        output_dir: impl AsRef<Path>,
+        executables_dir: impl AsRef<Path> + std::fmt::Debug,
+        output_dir: impl AsRef<Path> + std::fmt::Debug,
     ) -> Result<Self> {
         #[cfg(feature = "tracing")]
         tracing::debug!("Creating a new video fetcher with binaries installation");
@@ -237,7 +240,7 @@ impl Youtube {
     /// # Ok(())
     /// # }
     /// ```
-    #[cfg_attr(feature = "tracing", instrument(level = "debug"))]
+    #[cfg_attr(feature = "tracing", tracing::instrument(level = "debug"))]
     pub async fn update_downloader(&self) -> Result<()> {
         #[cfg(feature = "tracing")]
         tracing::debug!("Updating the downloader");
@@ -284,7 +287,7 @@ impl Youtube {
     /// # Ok(())
     /// # }
     /// ```
-    #[cfg_attr(feature = "tracing", instrument(level = "debug"))]
+    #[cfg_attr(feature = "tracing", tracing::instrument(level = "debug"))]
     pub async fn fetch_video_infos(&self, url: String) -> Result<Video> {
         #[cfg(feature = "tracing")]
         tracing::debug!("Fetching video information for {}", url);
@@ -338,7 +341,7 @@ impl Youtube {
     /// # Ok(())
     /// # }
     /// ```
-    #[cfg_attr(feature = "tracing", instrument(level = "debug"))]
+    #[cfg_attr(feature = "tracing", tracing::instrument(level = "debug"))]
     pub async fn download_video_from_url(&self, url: String, output: &str) -> Result<PathBuf> {
         #[cfg(feature = "tracing")]
         tracing::debug!("Downloading video from {}", url);
@@ -382,7 +385,7 @@ impl Youtube {
     /// # Ok(())
     /// # }
     /// ```
-    #[cfg_attr(feature = "tracing", instrument(level = "debug"))]
+    #[cfg_attr(feature = "tracing", tracing::instrument(level = "debug"))]
     pub async fn download_video(&self, video: &Video, output: &str) -> Result<PathBuf> {
         #[cfg(feature = "tracing")]
         tracing::debug!("Downloading video {}", video.title);
@@ -432,7 +435,7 @@ impl Youtube {
     /// # Ok(())
     /// # }
     /// ```
-    #[cfg_attr(feature = "tracing", instrument(level = "debug"))]
+    #[cfg_attr(feature = "tracing", tracing::instrument(level = "debug"))]
     pub async fn download_video_stream_from_url(
         &self,
         url: String,
@@ -480,7 +483,7 @@ impl Youtube {
     /// # Ok(())
     /// # }
     /// ```
-    #[cfg_attr(feature = "tracing", instrument(level = "debug"))]
+    #[cfg_attr(feature = "tracing", tracing::instrument(level = "debug"))]
     pub async fn download_video_stream(&self, video: &Video, output: &str) -> Result<PathBuf> {
         #[cfg(feature = "tracing")]
         tracing::debug!("Downloading video stream {}", video.title);
@@ -524,7 +527,7 @@ impl Youtube {
     /// # Ok(())
     /// # }
     /// ```
-    #[cfg_attr(feature = "tracing", instrument(level = "debug"))]
+    #[cfg_attr(feature = "tracing", tracing::instrument(level = "debug"))]
     pub async fn download_audio_stream_from_url(
         &self,
         url: String,
@@ -572,7 +575,7 @@ impl Youtube {
     /// # Ok(())
     /// # }
     /// ```
-    #[cfg_attr(feature = "tracing", instrument(level = "debug"))]
+    #[cfg_attr(feature = "tracing", tracing::instrument(level = "debug"))]
     pub async fn download_audio_stream(&self, video: &Video, output: &str) -> Result<PathBuf> {
         #[cfg(feature = "tracing")]
         tracing::debug!("Downloading audio stream {}", video.title);
@@ -622,7 +625,7 @@ impl Youtube {
     /// # Ok(())
     /// # }
     /// ```
-    #[cfg_attr(feature = "tracing", instrument(level = "debug"))]
+    #[cfg_attr(feature = "tracing", tracing::instrument(level = "debug"))]
     pub async fn download_format(&self, format: &Format, output: &str) -> Result<PathBuf> {
         #[cfg(feature = "tracing")]
         tracing::debug!("Downloading format {}", format.download_info.url);
@@ -677,7 +680,7 @@ impl Youtube {
     /// # Ok(())
     /// # }
     /// ```
-    #[cfg_attr(feature = "tracing", instrument(level = "debug"))]
+    #[cfg_attr(feature = "tracing", tracing::instrument(level = "debug"))]
     pub async fn combine_audio_and_video(
         &self,
         audio_file: &str,
@@ -752,7 +755,7 @@ impl Youtube {
     /// # Ok(())
     /// # }
     /// ```
-    #[cfg_attr(feature = "tracing", instrument(level = "debug"))]
+    #[cfg_attr(feature = "tracing", tracing::instrument(level = "debug"))]
     pub async fn download_thumbnail_from_url(
         &self,
         url: String,
@@ -800,7 +803,7 @@ impl Youtube {
     /// # Ok(())
     /// # }
     /// ```
-    #[cfg_attr(feature = "tracing", instrument(level = "debug"))]
+    #[cfg_attr(feature = "tracing", tracing::instrument(level = "debug"))]
     pub async fn download_thumbnail(&self, video: &Video, file_name: &str) -> Result<PathBuf> {
         #[cfg(feature = "tracing")]
         tracing::debug!("Downloading thumbnail {}", video.title);

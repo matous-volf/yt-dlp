@@ -64,7 +64,7 @@ impl WantedRelease {
     /// release.download(destination).await?;
     /// # Ok(())
     /// # }
-    #[cfg_attr(feature = "tracing", instrument(level = "debug", skip(self)))]
+    #[cfg_attr(feature = "tracing", tracing::instrument(level = "debug", skip(self)))]
     pub async fn download(&self, destination: PathBuf) -> Result<()> {
         #[cfg(feature = "tracing")]
         tracing::debug!(

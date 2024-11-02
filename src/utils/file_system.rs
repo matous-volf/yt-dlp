@@ -93,8 +93,11 @@ pub fn create_parent_dir(destination: impl AsRef<Path>) -> Result<()> {
 ///
 /// * `zip_path` - The path to the zip file.
 /// * `destination` - The path to extract the zip file to.
-#[cfg_attr(feature = "tracing", instrument(level = "debug"))]
-pub fn extract_zip(zip_path: impl AsRef<Path>, destination: impl AsRef<Path>) -> Result<()> {
+#[cfg_attr(feature = "tracing", tracing::instrument(level = "debug"))]
+pub fn extract_zip(
+    zip_path: impl AsRef<Path> + std::fmt::Debug,
+    destination: impl AsRef<Path> + std::fmt::Debug,
+) -> Result<()> {
     #[cfg(feature = "tracing")]
     tracing::debug!(
         "Extracting zip file: {:?} to {:?}",
@@ -136,8 +139,11 @@ pub fn extract_zip(zip_path: impl AsRef<Path>, destination: impl AsRef<Path>) ->
 ///
 /// * `tar_path` - The path to the tar.xz file.
 /// * `destination` - The path to extract the tar.xz file to.
-#[cfg_attr(feature = "tracing", instrument(level = "debug"))]
-pub fn extract_tar_xz(tar_path: impl AsRef<Path>, destination: impl AsRef<Path>) -> Result<()> {
+#[cfg_attr(feature = "tracing", tracing::instrument(level = "debug"))]
+pub fn extract_tar_xz(
+    tar_path: impl AsRef<Path> + std::fmt::Debug,
+    destination: impl AsRef<Path> + std::fmt::Debug,
+) -> Result<()> {
     #[cfg(feature = "tracing")]
     tracing::debug!(
         "Extracting tar.xz file: {:?} to {:?}",

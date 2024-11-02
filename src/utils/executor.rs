@@ -57,7 +57,7 @@ impl Executor {
     /// # Errors
     ///
     /// This function will return an error if the command could not be executed, or if the process timed out.
-    #[cfg_attr(feature = "tracing", instrument(level = "debug", skip(self)))]
+    #[cfg_attr(feature = "tracing", tracing::instrument(level = "debug", skip(self)))]
     pub async fn execute(&self) -> Result<ProcessOutput> {
         #[cfg(feature = "tracing")]
         tracing::debug!("Executing command: {:?}", self);

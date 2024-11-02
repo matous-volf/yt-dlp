@@ -32,8 +32,8 @@ pub fn find_executable(name: &str) -> String {
 ///
 /// * `first` - The first future to await.
 /// * `second` - The second future to await.
-#[cfg_attr(feature = "tracing", instrument(level = "debug"))]
-pub async fn await_two<T>(
+#[cfg_attr(feature = "tracing", tracing::instrument(level = "debug"))]
+pub async fn await_two<T: std::fmt::Debug>(
     first: JoinHandle<Result<T>>,
     second: JoinHandle<Result<T>>,
 ) -> Result<(T, T)> {
@@ -51,10 +51,10 @@ pub async fn await_two<T>(
 /// # Arguments
 ///
 /// * `handles` - The futures to await.
-#[cfg_attr(feature = "tracing", instrument(level = "debug"))]
+#[cfg_attr(feature = "tracing", tracing::instrument(level = "debug"))]
 pub async fn await_all<T, I>(handles: I) -> Result<Vec<T>>
 where
-    I: IntoIterator<Item = JoinHandle<Result<T>>>,
+    I: IntoIterator<Item = JoinHandle<Result<T>>> + std::fmt::Debug,
     T: Send + 'static,
 {
     let results = futures_util::future::try_join_all(handles).await?;

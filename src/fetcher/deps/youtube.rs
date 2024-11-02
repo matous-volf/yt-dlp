@@ -52,7 +52,7 @@ impl GitHubFetcher {
     /// # Arguments
     ///
     /// * `auth_token` - An optional GitHub personal access token to authenticate the request.
-    #[cfg_attr(feature = "tracing", instrument(level = "debug", skip(self)))]
+    #[cfg_attr(feature = "tracing", tracing::instrument(level = "debug", skip(self)))]
     pub async fn fetch_release(&self, auth_token: Option<String>) -> Result<WantedRelease> {
         #[cfg(feature = "tracing")]
         tracing::debug!("Fetching latest release for {}/{}", self.owner, self.repo);
@@ -71,7 +71,7 @@ impl GitHubFetcher {
     /// * `platform` - The platform to fetch the release for.
     /// * `architecture` - The architecture to fetch the release for.
     /// * `auth_token` - An optional GitHub personal access token to authenticate the request.
-    #[cfg_attr(feature = "tracing", instrument(level = "debug", skip(self)))]
+    #[cfg_attr(feature = "tracing", tracing::instrument(level = "debug", skip(self)))]
     pub async fn fetch_release_for_platform(
         &self,
         platform: Platform,
@@ -103,7 +103,7 @@ impl GitHubFetcher {
     /// # Arguments
     ///
     /// * `auth_token` - An optional GitHub personal access token to authenticate the request.
-    #[cfg_attr(feature = "tracing", instrument(level = "debug", skip(self)))]
+    #[cfg_attr(feature = "tracing", tracing::instrument(level = "debug", skip(self)))]
     pub async fn fetch_latest_release(&self, auth_token: Option<String>) -> Result<Release> {
         #[cfg(feature = "tracing")]
         tracing::debug!("Fetching latest release for {}/{}", self.owner, self.repo);
@@ -127,7 +127,7 @@ impl GitHubFetcher {
     /// * `platform` - The platform to select the asset for.
     /// * `architecture` - The architecture to select the asset for.
     /// * `release` - The release to select the asset from.
-    #[cfg_attr(feature = "tracing", instrument(level = "debug", skip(self)))]
+    #[cfg_attr(feature = "tracing", tracing::instrument(level = "debug"))]
     pub fn select_asset<'a>(
         platform: &Platform,
         architecture: &Architecture,

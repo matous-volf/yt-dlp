@@ -43,7 +43,7 @@ pub enum Architecture {
 
 impl Platform {
     /// Detects the current platform where the program is running.
-    #[cfg_attr(feature = "tracing", instrument(level = "debug", skip(self)))]
+    #[cfg_attr(feature = "tracing", tracing::instrument(level = "debug"))]
     pub fn detect() -> Self {
         let os = std::env::consts::OS;
 
@@ -61,7 +61,7 @@ impl Platform {
 
 impl Architecture {
     /// Detects the current architecture of the CPU where the program is running.
-    #[cfg_attr(feature = "tracing", instrument(level = "debug", skip(self)))]
+    #[cfg_attr(feature = "tracing", tracing::instrument(level = "debug"))]
     pub fn detect() -> Self {
         let arch = std::env::consts::ARCH;
 
