@@ -95,21 +95,21 @@ jobs:
         with:
           sarif_file: results.sarif
 
-    codeql-analysis:
-      name: 🔍 CodeQL analysis
-      needs: setup-and-build
-      runs-on: ubuntu-latest
-      permissions:
-        security-events: write
+  codeql-analysis:
+    name: 🔍 CodeQL analysis
+    needs: setup-and-build
+    runs-on: ubuntu-latest
+    permissions:
+      security-events: write
 
-      steps:
-        - name: 📁 Check out the repository
-          uses: actions/checkout@v4.2.2
+    steps:
+      - name: 📁 Check out the repository
+        uses: actions/checkout@v4.2.2
 
-        - name: 🛠️ Set up CodeQL
-          uses: github/codeql-action/init@v3
-          with:
-            languages: 'rust'
+      - name: 🛠️ Set up CodeQL
+        uses: github/codeql-action/init@v3
+        with:
+          languages: 'rust'
 
-        - name: Perform CodeQL Analysis
-          uses: github/codeql-action/analyze@v3
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v3
