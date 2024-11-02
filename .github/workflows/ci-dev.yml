@@ -13,7 +13,7 @@ permissions:
 
 jobs:
   setup-and-build:
-    name: Setup and build
+    name: 🦀 Setup and build
     runs-on: ubuntu-latest
 
     steps:
@@ -50,7 +50,7 @@ jobs:
           command: build
 
   sonarcloud-analysis:
-    name: SonarCloud analysis
+    name: 🔍 SonarCloud analysis
     needs: setup-and-build
     runs-on: ubuntu-latest
 
@@ -65,7 +65,7 @@ jobs:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
   scorecard-analysis:
-    name: Scorecard analysis
+    name: 🔍 Scorecard analysis
     needs: setup-and-build
     runs-on: ubuntu-latest
     permissions:
@@ -95,3 +95,20 @@ jobs:
         with:
           sarif_file: results.sarif
 
+    codeql-analysis:
+      name: 🔍 CodeQL analysis
+      runs-on: ubuntu-latest
+      permissions:
+        security-events: write
+
+      steps:
+        - name: 📁 Check out the repository
+          uses: actions/checkout@v4.2.2
+
+        - name: 🛠️ Set up CodeQL
+          uses: github/codeql-action/init@v3
+          with:
+            languages: 'rust'
+
+        - name: Perform CodeQL Analysis
+          uses: github/codeql-action/analyze@v3
