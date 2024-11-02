@@ -10,7 +10,7 @@ permissions:
 
 jobs:
   create_release:
-    name: ?? Create a new release
+    name: 🔖 Create a new release
     runs-on: ubuntu-latest
     permissions:
       contents: write
