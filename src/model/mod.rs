@@ -34,8 +34,8 @@ pub struct Video {
     pub view_count: i64,
     /// The number of likes the video has. None, when the author has hidden it.
     pub like_count: Option<i64>,
-    /// The number of comments the video has.
-    pub comment_count: i64,
+    /// The number of comments the video has. None, when the author has disabled comments.
+    pub comment_count: Option<i64>,
 
     /// The channel display name.
     pub channel: String,
