@@ -32,8 +32,8 @@ pub struct Video {
 
     /// The number of views the video has.
     pub view_count: i64,
-    /// The number of likes the video has.
-    pub like_count: i64,
+    /// The number of likes the video has. None, when the author has hidden it.
+    pub like_count: Option<i64>,
     /// The number of comments the video has.
     pub comment_count: i64,
 
