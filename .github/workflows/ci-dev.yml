@@ -36,7 +36,7 @@ jobs:
         uses: actions-rs/cargo@v1
         with:
           command: clippy
-          args: --all-features -- -D warnings
+          args: --all-features --all-targets -- -D warnings
 
       - name: 💄 Format code with Cargo formatter
         uses: actions-rs/cargo@v1
@@ -48,7 +48,7 @@ jobs:
         uses: actions-rs/cargo@v1
         with:
           command: build
-          args: --all-features
+          args: --all-features --all-targets
 
   sonarcloud-analysis:
     name: 🔍 SonarCloud analysis

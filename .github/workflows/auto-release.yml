@@ -9,8 +9,33 @@ permissions:
   contents: read
 
 jobs:
+  check_status:
+    name: ✅ Check Github CI - Development status
+    runs-on: ubuntu-latest
+    outputs:
+      ci_success: ${{ steps.check.outputs.ci_success }}
+    steps:
+      - name: 🔍 Check if last CI run was successful
+        id: check_ci
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const runs = await github.rest.actions.listWorkflowRuns({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              workflow_id: "Github CI - Development",
+              branch: "develop",
+              status: "success",
+              per_page: 1
+            });
+            
+            core.setOutput("ci_success", runs.data.workflow_runs.length > 0 ? "true" : "false");
+
   create_release:
     name: 🔖 Create a new release
+    needs: check_status
+    if: ${{ needs.check_status.outputs.ci_success == 'true' }}
+
     runs-on: ubuntu-latest
     permissions:
       contents: write
