@@ -11,7 +11,7 @@ pub struct AutomaticCaption {
     /// The URL of the caption file.
     pub url: String,
     /// The language of the caption file, e.g. 'English'.
-    pub name: String,
+    pub name: Option<String>,
 }
 
 /// The available extensions for automatic caption files.
