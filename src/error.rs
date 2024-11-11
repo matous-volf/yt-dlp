@@ -1,6 +1,6 @@
 //! The errors that can occur.
 
-use crate::fetcher::platform::{Architecture, Platform};
+use crate::utils::platform::{Architecture, Platform};
 use thiserror::Error;
 
 /// A type alias for `Result<T, Error>`.

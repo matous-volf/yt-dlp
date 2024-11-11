@@ -1,11 +1,22 @@
 //! Fetch the latest release of 'ffmpeg' from static builds.
 
 use crate::error::{Error, Result};
-use crate::fetcher::model::{Asset, WantedRelease};
-use crate::fetcher::platform::{Architecture, Platform};
+use crate::fetcher::deps::{Asset, WantedRelease};
 use crate::utils::file_system;
+use crate::utils::platform::{Architecture, Platform};
 use derive_more::Display;
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
+
+#[cfg(target_os = "windows")]
+const FFMPEG_BUILD_URL: &'static str = "https://www.gyan.dev/ffmpeg/builds/ffmpeg-release-essentials.zip";
+
+#[cfg(all(target_os = "macos", target_arch = "x86_64"))]
+const FFMPEG_BUILD_URL: &'static str = "https://www.osxexperts.net/ffmpeg71intel.zip";
+#[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+const FFMPEG_BUILD_URL: &'static str = "https://www.osxexperts.net/ffmpeg71arm.zip";
+
+#[cfg(target_os = "linux")]
+const FFMPEG_BUILD_URL: &'static str = "https://johnvansickle.com/ffmpeg/releases/ffmpeg-release-{}-static.tar.xz";
 
 /// The ffmpeg fetcher is responsible for fetching the ffmpeg binary for the current platform and architecture.
 /// It can also extract the binary from the downloaded archive.
@@ -129,7 +140,7 @@ impl BuildFetcher {
     /// The resulting binary will be placed in the same directory as the archive.
     /// The archive will be deleted after the binary has been extracted.
     #[cfg_attr(feature = "tracing", tracing::instrument(level = "debug", skip(self)))]
-    pub async fn extract_binary(&self, archive: PathBuf) -> Result<PathBuf> {
+    pub async fn extract_binary(&self, archive: impl AsRef<Path>) -> Result<PathBuf> {
         #[cfg(feature = "tracing")]
         tracing::debug!("Extracting ffmpeg binary from archive: {:?}", archive);
 
@@ -149,10 +160,11 @@ impl BuildFetcher {
     /// * `archive` - The path to the downloaded archive.
     /// * `platform` - The platform to extract the binary for.
     /// * `architecture` - The architecture to extract the binary for.
+    #[allow(unused_variables)]
     #[cfg_attr(feature = "tracing", tracing::instrument(level = "debug", skip(self)))]
     pub async fn extract_binary_for_platform(
         &self,
-        archive: PathBuf,
+        archive: impl AsRef<Path>,
         platform: Platform,
         architecture: Architecture,
     ) -> Result<PathBuf> {
@@ -164,81 +176,77 @@ impl BuildFetcher {
             archive
         );
 
-        let destination = archive.with_extension("");
+        let destination = archive.as_ref().with_extension("");
 
-        let archive_clone = archive.clone();
-        let destination_clone = destination.clone();
-
-        match platform {
-            Platform::Windows => {
-                tokio::task::spawn_blocking(move || {
-                    file_system::extract_zip(archive_clone, destination_clone)
-                })
-                .await??;
-
-                let extracted = destination.join("ffmpeg-7.1-essentials_build");
-                let executable = extracted.join("bin").join("ffmpeg.exe");
-
-                let parent = destination
-                    .parent()
-                    .ok_or(Error::Binary(platform, architecture))?;
-                let binary = parent.join("ffmpeg.exe");
-
-                tokio::fs::copy(executable, binary.clone()).await?;
-                tokio::fs::remove_dir_all(destination).await?;
-                tokio::fs::remove_file(archive).await?;
-
-                Ok(binary)
-            }
-            Platform::Mac => {
-                tokio::task::spawn_blocking(move || {
-                    file_system::extract_zip(archive_clone, destination_clone)
-                })
-                .await??;
-
-                let executable = destination.join("ffmpeg");
-
-                let parent = destination
-                    .parent()
-                    .ok_or(Error::Binary(platform, architecture))?;
-                let binary = parent.join("ffmpeg");
-
-                tokio::fs::copy(executable, binary.clone()).await?;
-                tokio::fs::remove_dir_all(destination).await?;
-                tokio::fs::remove_file(archive).await?;
-
-                file_system::set_executable(binary.clone())?;
-                Ok(binary)
-            }
-            Platform::Linux => {
-                tokio::task::spawn_blocking(move || {
-                    file_system::extract_tar_xz(archive_clone, destination_clone)
-                })
-                .await??;
-
-                let extracted = match architecture {
-                    Architecture::X64 => "ffmpeg-7.0.2-amd64-static",
-                    Architecture::X86 => "ffmpeg-7.0.2-i686-static",
-                    Architecture::Armv7l => "ffmpeg-7.0.2-armhf-static",
-                    Architecture::Aarch64 => "ffmpeg-7.0.2-arm64-static",
-                    _ => return Err(Error::Binary(platform, architecture)),
-                };
-                let extracted = destination.join(extracted);
-                let executable = extracted.join("ffmpeg");
-
-                let parent = destination
-                    .parent()
-                    .ok_or(Error::Binary(platform, architecture))?;
-                let binary = parent.join("ffmpeg");
-
-                tokio::fs::copy(executable, binary.clone()).await?;
-                tokio::fs::remove_dir_all(destination).await?;
-
-                file_system::set_executable(binary.clone())?;
-                Ok(binary)
-            }
-
-            _ => Err(Error::Binary(platform, architecture)),
+        #[cfg(target_os = "windows")] {
+            return self.extract_archive(archive, destination.clone()).await
         }
+
+        #[cfg(target_os = "macos")] {
+            return self.extract_archive(archive, destination.clone()).await
+        }
+
+        #[cfg(target_os = "linux")] {
+            let extracted = match architecture {
+                Architecture::X64 => "ffmpeg-7.0.2-amd64-static",
+                Architecture::X86 => "ffmpeg-7.0.2-i686-static",
+                Architecture::Armv7l => "ffmpeg-7.0.2-armhf-static",
+                Architecture::Aarch64 => "ffmpeg-7.0.2-arm64-static",
+                _ => return Err(Error::Binary(platform, architecture)),
+            };
+
+            return self.extract_archive(archive, destination.clone(), extracted).await
+        }
+    }
+
+    #[cfg(target_os = "windows")]
+    pub async fn extract_archive(&self, archive: PathBuf, destination: impl AsRef<Path>) -> Result<PathBuf> {
+        file_system::extract_zip(archive.clone(), destination_clone).await?;
+
+        let extracted = destination.join("ffmpeg-7.1-essentials_build");
+        let executable = extracted.join("bin").join("ffmpeg.exe");
+
+        let parent = file_system::try_parent(&destination)?;
+        let binary = parent.join("ffmpeg.exe");
+
+        tokio::fs::copy(executable, binary.clone()).await?;
+        tokio::fs::remove_dir_all(destination).await?;
+        tokio::fs::remove_file(archive).await?;
+
+        Ok(binary)
+    }
+
+    #[cfg(target_os = "macos")]
+    pub async fn extract_archive(&self, archive: impl AsRef<Path>, destination: impl AsRef<Path>) -> Result<PathBuf> {
+        file_system::extract_zip(&archive, &destination).await?;
+
+        let executable = destination.as_ref().join("ffmpeg");
+
+        let parent = file_system::try_parent(&destination)?;
+        let binary = parent.join("ffmpeg");
+
+        tokio::fs::copy(executable, binary.clone()).await?;
+        tokio::fs::remove_dir_all(destination).await?;
+        tokio::fs::remove_file(archive).await?;
+
+        file_system::set_executable(binary.clone())?;
+        Ok(binary)
+    }
+
+    #[cfg(target_os = "linux")]
+    pub async fn extract_archive(&self, archive: PathBuf, destination: PathBuf, extracted: impl AsRef<str>) -> Result<PathBuf> {
+        file_system::extract_tar_xz(archive.clone(), destination.clone()).await?;
+
+        let extracted = destination.join(extracted);
+        let executable = extracted.join("ffmpeg");
+
+        let parent = file_system::try_parent(&destination)?;
+        let binary = parent.join("ffmpeg");
+
+        tokio::fs::copy(executable, binary.clone()).await?;
+        tokio::fs::remove_dir_all(destination).await?;
+
+        file_system::set_executable(binary.clone())?;
+        Ok(binary)
     }
 }

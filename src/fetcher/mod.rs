@@ -1,20 +1,21 @@
 //! Tools for fetching data from a URL.
 //!
-//! This module contains structs for fetching data from GitHub and ffmpeg, or over HTTP.
-//! There is a platform module for detecting the current platform and architecture.
-//! It also contains structs for representing the fetched data, such as GitHub releases and assets.
+//! This module is subdivided into several modules, each responsible for fetching a specific type of data.
+//! This module contains structs for fetching video data, dependencies binaries, or HTTP data.
+//!
+//! The `blocking` module contains blocking functions for fetching data from YouTube.
 
 use crate::error::{Error, Result};
 use crate::utils::file_system;
 use derive_more::Display;
 use futures_util::StreamExt;
 use reqwest::header::{HeaderMap, HeaderValue, USER_AGENT};
-use std::io::Write;
-use std::path::PathBuf;
+use std::path::{Path};
+use tokio::io::AsyncWriteExt;
 
 pub mod deps;
-pub mod model;
-pub mod platform;
+pub mod streams;
+pub mod thumbnail;
 
 /// The fetcher is responsible for fetching data from a URL.
 /// # Examples
@@ -45,9 +46,9 @@ impl Fetcher {
     /// # Arguments
     ///
     /// * `url` - The URL to fetch data from.
-    pub fn new(url: &str) -> Self {
+    pub fn new(url: impl AsRef<str>) -> Self {
         Self {
-            url: url.to_string(),
+            url: url.as_ref().to_string(),
         }
     }
 
@@ -97,23 +98,20 @@ impl Fetcher {
     ///
     /// This function will return an error if the asset could not be fetched or written to the destination.
     #[cfg_attr(feature = "tracing", tracing::instrument(level = "debug", skip(self)))]
-    pub async fn fetch_asset(&self, destination: PathBuf) -> Result<()> {
+    pub async fn fetch_asset(&self, destination: impl AsRef<Path>) -> Result<()> {
         #[cfg(feature = "tracing")]
         tracing::debug!("Fetching asset from {} to {:?}", self.url, destination);
 
         let response = reqwest::get(&self.url).await?.error_for_status()?;
+        file_system::create_parent_dir(&destination)?;
 
-        if let Some(parent) = destination.parent() {
-            tokio::fs::create_dir_all(parent).await?;
-        }
-
-        let mut dest = file_system::create_file(destination)?;
+        let mut dest = file_system::create_file(destination).await?;
         let mut stream = response.bytes_stream();
 
         while let Some(chunk) = stream.next().await {
             let chunk = chunk?;
 
-            dest.write_all(&chunk)?;
+            dest.write_all(&chunk).await?;
         }
 
         Ok(())

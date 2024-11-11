@@ -3,25 +3,24 @@
 //! This module contains various utility to interact with the shell, and the file system.
 
 use crate::error::Result;
-use crate::fetcher::platform::Platform;
-use serde::{Deserialize, Deserializer};
+use platform::Platform;
 use tokio::task::JoinHandle;
 
-pub mod executor;
 pub mod file_system;
+pub mod platform;
 
 /// Converts a vector of string slices to a vector of owned strings.
-pub fn to_owned(vec: Vec<&str>) -> Vec<String> {
-    vec.into_iter().map(|s| s.to_owned()).collect()
+pub fn to_owned(vec: Vec<impl AsRef<str>>) -> Vec<String> {
+    vec.into_iter().map(|s| s.as_ref().to_owned()).collect()
 }
 
 /// Find the name of the executable for the given platform.
-pub fn find_executable(name: &str) -> String {
+pub fn find_executable(name: impl AsRef<str>) -> String {
     let platform = Platform::detect();
 
     match platform {
-        Platform::Windows => format!("{}.exe", name),
-        _ => name.to_owned(),
+        Platform::Windows => format!("{}.exe", name.as_ref()),
+        _ => name.as_ref().to_string(),
     }
 }
 
@@ -60,19 +59,6 @@ where
     let results = futures_util::future::try_join_all(handles).await?;
 
     results.into_iter().collect()
-}
-
-/// Fix issue with 'none' string in JSON.
-pub fn json_none<'de, D>(deserializer: D) -> std::result::Result<Option<String>, D::Error>
-where
-    D: Deserializer<'de>,
-{
-    let string: Option<String> = Option::deserialize(deserializer)?;
-
-    match string.as_deref() {
-        Some("none") => Ok(None),
-        _ => Ok(string),
-    }
 }
 
 /// A macro to mimic the ternary operator in Rust.

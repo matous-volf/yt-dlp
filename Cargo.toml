@@ -4,7 +4,7 @@ edition = "2021"
 version = "1.2.3"
 
 authors = ["boul2gom <contact@boul2gom.fr>"]
-description = "⚙️ A Rust library (with auto dependencies downloading) for yt-dlp 🎬️"
+description = "🎬️ A Rust library (with auto dependencies installation) for Youtube downloading"
 
 license = "GPL-3.0"
 readme = "README.md"
@@ -12,8 +12,8 @@ documentation = "https://docs.rs/yt-dlp"
 homepage = "https://github.com/boul2gom/yt-dlp"
 repository = "https://github.com/boul2gom/yt-dlp"
 
-categories = ["api-bindings", "asynchronous", "development-tools"]
-keywords = ["youtube", "yt-dlp", "async", "downloader"]
+categories = ["api-bindings", "asynchronous", "multimedia", "multimedia::audio", "multimedia::video"]
+keywords = ["youtube", "downloader", "async", "yt-dlp", "youtube-dl"]
 
 [package.metadata.docs.rs]
 all-features = true
@@ -26,12 +26,11 @@ pre-release-commit-message = "🚧 v{{version}}"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [features]
-default = []
 tracing = ["dep:tracing"]
 
 [dependencies]
 # Runtime and async dependencies
-tokio = { version = "1.41.0", features = ["rt-multi-thread", "macros", "fs", "time", "process"] }
+tokio = { version = "1.41.1", features = ["rt-multi-thread", "macros", "fs", "time", "process"], default-features = false }
 reqwest = { version = "0.12.9", features = ["json", "stream"] }
 futures-util = "0.3.31"
 
@@ -41,12 +40,12 @@ serde_json = "1.0.132"
 
 # Error handling dependencies
 derive_more = { version = "1.0.0", features = ["display", "constructor"] }
-thiserror = "1.0.66"
+thiserror = "2.0.3"
 
 # Misc and compression dependencies
-ordered-float = "4.4.0"
+ordered-float = "4.5.0"
 flate2 = "1.0.34"
-tar = "0.4.42"
+tar = "0.4.43"
 zip = "2.2.0"
 xz2 = "0.1.7"
 

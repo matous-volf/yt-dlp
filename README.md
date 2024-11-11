@@ -1,8 +1,10 @@
-<h2 align="center">⚙️ A Rust library (with auto dependencies downloading) for yt-dlp 🎬️</h2>
+<h2 align="center">🎬️ A Rust library (with auto dependencies installation) for YouTube downloading</h2>
 
 <div align="center">This library is a Rust asynchronous wrapper around the yt-dlp command line tool, a feature-rich youtube (and others) audio/video downloader, which is a fork of youtube-dl with a lot of additional features and improvements.</div>
-<div align="center">The crate is designed to be used in a Rust project to download audio and video from various websites.</div>
-<div align="center">You don't need to care about dependencies, yt-dlp and ffmpeg will be downloaded automatically.</div>
+<div align="center">
+  The crate is designed to download audio and video from various websites.
+  You don't need to care about dependencies, yt-dlp and ffmpeg will be downloaded automatically.
+</div>
 
 <br>
 <div align="center">⚠️ The project is still in development, so if you encounter any bugs or have any feature requests, please open an issue or a discussion.</div>
@@ -63,6 +65,16 @@
 
 ---
 
+## 💭️ Why using external Python app ?
+
+Originally, to download videos from YouTube, I used the [```rustube```](https://crates.io/crates/rustube) crate, written in pure Rust and without any external dependencies.
+However, I quickly realized that due to frequent breaking changes on the YouTube website, the crate was outdated and no longer functional.
+
+After few tests and researches, I concluded that the python app [```yt-dlp```](https://github.com/yt-dlp/yt-dlp/) was the best compromise, thanks to its regular updates and massive community.
+His standalone binaries and his ability to output the fetched data in JSON format make it a most imperfect candidate for a Rust wrapper.
+
+Using an external program is not ideal, but it is the most reliable and maintained solution for now.
+
 ## 📥 How to get it
 
 Add the following to your `Cargo.toml` file:
@@ -74,7 +86,14 @@ yt-dlp = "latest version of the crate"
 A new release is automatically published every two weeks, to keep up to date with dependencies and features.
 Make sure to check the [releases](https://github.com/boul2gom/yt-dlp/releases) page to see the latest version of the crate.
 
-## 🔌 Available features
+## 🔌 Optional features
+
+This library puts a lot of functionality behind optional features in order to optimize
+compile time for the most common use cases. The following features are
+available.
+
+- **`tracing`** — <img align="center" width="20" alt="Tracing" src="https://raw.githubusercontent.com/tokio-rs/tracing/refs/heads/master/assets/logo.svg" /> Enables profiling with the [```tracing```](https://crates.io/crates/tracing) crate.
+  When this feature is enabled, the library will output span events at log levels `trace` and `debug`, depending on the importance of the called function.
 
 #### 📝 Profiling with `tracing` (disabled by default):
 The crate supports the `tracing` feature to enable profiling, which can be useful for debugging.
@@ -90,7 +109,7 @@ The documentation is available on [docs.rs](https://docs.rs/yt-dlp).
 
 ## 📚 Examples
 
-- 📦 Installing the [yt-dlp](https://github.com/yt-dlp/yt-dlp/) and [ffmpeg](https://ffmpeg.org/) binaries:
+- 📦 Installing the [```yt-dlp```](https://github.com/yt-dlp/yt-dlp/) and [```ffmpeg```](https://ffmpeg.org/) binaries:
 ```rust
 use yt_dlp::Youtube;
 use std::path::PathBuf;
@@ -105,7 +124,7 @@ pub async fn main() -> Result<(), Box<dyn std::error::Error>> {
 }
 ```
 
-- 📦 Installing the yt-dlp binary only:
+- 📦 Installing the [```yt-dlp```](https://github.com/yt-dlp/yt-dlp/) binary only:
 ```rust
 use yt_dlp::fetcher::deps::LibraryInstaller;
 use std::path::PathBuf;
@@ -120,7 +139,7 @@ pub async fn main() -> Result<(), Box<dyn std::error::Error>> {
 }
 ```
 
-- 📦 Installing the ffmpeg binary only:
+- 📦 Installing the [```ffmpeg```](https://ffmpeg.org/) binary only:
 ```rust
 use yt_dlp::fetcher::deps::LibraryInstaller;
 use std::path::PathBuf;
@@ -135,7 +154,7 @@ pub async fn main() -> Result<(), Box<dyn std::error::Error>> {
 }
 ```
 
-- 🔄 Updating the yt-dlp binary:
+- 🔄 Updating the [```yt-dlp```](https://github.com/yt-dlp/yt-dlp/) binary:
 ```rust
 use yt_dlp::Youtube;
 use std::path::PathBuf;
@@ -311,8 +330,35 @@ pub async fn main() -> Result<(), Box<dyn std::error::Error>> {
 }
 ```
 
+## 🐛 Bugs reported
+- [ ] Output dir not created, so video are downloaded in the void
+- [ ] Dependencies are re-installed
+- [ ] Download is very slow
+
 ## 💡Support coming soon
 - [ ] Subtitles
 - [ ] Chapters
 - [ ] Heatmap
 - [ ] Playlist (and index)
+- [ ] TikTok videos
+- [ ] Instagram videos
+- [ ] Twitter videos
+- [ ] Twitch videos
+- [ ] Global ```yt-dlp``` providers
+
+## 💡Features coming soon
+- [ ] Common traits on all structs
+- [ ] Cache system for fetched data (downloaded files with metadata, hash and format stored in a database)
+- [ ] Metadata and tags on downloaded files
+- [ ] Thumbnails and cover arts on downloaded files
+- [ ] Proxy support for ```yt-dlp``` and ```reqwest```
+- [ ] Resuming downloads with HTTP Range requests
+- [ ] Downloading only a part of a video or audio
+- [ ] Audio and video format selection with enums
+- [ ] Post-processing options with ```ffmpeg```
+- [ ] Live streams serving, through a local server
+- [ ] Live streams recording, with ```ffmpeg``` or ```reqwest```
+- [ ] Notifications and alerts on download events
+- [ ] Webhooks, Rust hooks and callbacks on download events, errors and progress
+- [ ] Scheduled downloads and downloads queue with priority and network limits
+- [ ] Statistics and analytics on downloads and fetches

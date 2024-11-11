@@ -1,11 +1,13 @@
 //! Fetch the latest release of 'yt-dlp' from a GitHub repository.
 
 use crate::error::{Error, Result};
-use crate::fetcher::model::{Asset, Release, WantedRelease};
-use crate::fetcher::platform::Architecture;
-use crate::fetcher::platform::Platform;
+use crate::fetcher::deps::{Asset, Release, WantedRelease};
 use crate::fetcher::Fetcher;
+use crate::utils::platform::Architecture;
+use crate::utils::platform::Platform;
 use derive_more::Display;
+
+const BASE_ASSET_NAME: &'static str = "yt-dlp";
 
 /// The GitHub fetcher is responsible for fetching the latest release of 'yt-dlp' from a GitHub repository.
 /// It can also select the correct asset for the current platform and architecture.
@@ -40,10 +42,10 @@ impl GitHubFetcher {
     ///
     /// * `owner` - The owner of the GitHub repository.
     /// * `repo` - The name of the GitHub repository.
-    pub fn new(owner: &str, repo: &str) -> Self {
+    pub fn new(owner: impl AsRef<str>, repo: impl AsRef<str>) -> Self {
         Self {
-            owner: owner.to_string(),
-            repo: repo.to_string(),
+            owner: owner.as_ref().to_string(),
+            repo: repo.as_ref().to_string(),
         }
     }
 
@@ -133,8 +135,6 @@ impl GitHubFetcher {
         architecture: &Architecture,
         release: &'a Release,
     ) -> Option<&'a Asset> {
-        const BASE_NAME: &str = "yt-dlp";
-
         #[cfg(feature = "tracing")]
         tracing::debug!(
             "Selecting asset for platform: {:?}, architecture: {:?}",
@@ -148,23 +148,23 @@ impl GitHubFetcher {
 
             match (platform, architecture) {
                 (Platform::Windows, Architecture::X64) => {
-                    name.contains(&format!("{}.exe", BASE_NAME))
+                    name.contains(&format!("{}.exe", BASE_ASSET_NAME))
                 }
                 (Platform::Windows, Architecture::X86) => {
-                    name.contains(&format!("{}_x86.exe", BASE_NAME))
+                    name.contains(&format!("{}_x86.exe", BASE_ASSET_NAME))
                 }
 
                 (Platform::Linux, Architecture::X64) => {
-                    name.contains(&format!("{}_linux", BASE_NAME))
+                    name.contains(&format!("{}_linux", BASE_ASSET_NAME))
                 }
                 (Platform::Linux, Architecture::Armv7l) => {
-                    name.contains(&format!("{}_linux_armv7l", BASE_NAME))
+                    name.contains(&format!("{}_linux_armv7l", BASE_ASSET_NAME))
                 }
                 (Platform::Linux, Architecture::Aarch64) => {
-                    name.contains(&format!("{}_linux_aarch64", BASE_NAME))
+                    name.contains(&format!("{}_linux_aarch64", BASE_ASSET_NAME))
                 }
 
-                (Platform::Mac, _) => name.contains(&format!("{}_macos", BASE_NAME)),
+                (Platform::Mac, _) => name.contains(&format!("{}_macos", BASE_ASSET_NAME)),
 
                 _ => false,
             }

@@ -1,6 +1,6 @@
 //! Formats-related models.
 
-use crate::utils::json_none;
+use crate::model::utils::serde::json_none;
 use serde::{Deserialize, Serialize};
 
 /// Represents an available format of a video.

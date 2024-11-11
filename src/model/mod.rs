@@ -12,6 +12,7 @@ use std::collections::HashMap;
 pub mod caption;
 pub mod format;
 pub mod thumbnail;
+pub mod utils;
 
 /// Represents a YouTube video, the output of 'yt-dlp'.
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]

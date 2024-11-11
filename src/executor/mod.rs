@@ -13,7 +13,7 @@ use tokio::io::AsyncReadExt;
 /// # use yt_dlp::utils;
 /// # use std::path::PathBuf;
 /// # use std::time::Duration;
-/// # use yt_dlp::utils::executor::Executor;
+/// # use yt_dlp::executor::Executor;
 /// # #[tokio::main]
 /// # async fn main() -> Result<(), Box<dyn std::error::Error>> {
 /// let args = vec!["--update"];

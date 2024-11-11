@@ -1,9 +1,9 @@
 //! Tools for working with the file system.
 
 use crate::error::{Error, Result};
-use std::fs::{File, OpenOptions};
 use std::path::{Path, PathBuf};
 use tar::Archive;
+use tokio::fs::{File, OpenOptions};
 use xz2::read::XzDecoder;
 use zip::ZipArchive;
 
@@ -46,7 +46,7 @@ pub fn try_parent(path: impl AsRef<Path>) -> Result<PathBuf> {
 /// # Arguments
 ///
 /// * `destination` - The path to create the file at.
-pub fn create_file(destination: impl AsRef<Path>) -> Result<File> {
+pub async fn create_file(destination: impl AsRef<Path>) -> Result<File> {
     let mut open_options = OpenOptions::new();
     open_options.read(true);
     open_options.write(true);
@@ -54,11 +54,10 @@ pub fn create_file(destination: impl AsRef<Path>) -> Result<File> {
 
     #[cfg(not(target_os = "windows"))]
     {
-        use std::os::unix::fs::OpenOptionsExt;
         open_options.mode(0o755);
     }
 
-    let file = open_options.open(destination)?;
+    let file = open_options.open(destination).await?;
     Ok(file)
 }
 
@@ -94,9 +93,9 @@ pub fn create_parent_dir(destination: impl AsRef<Path>) -> Result<()> {
 /// * `zip_path` - The path to the zip file.
 /// * `destination` - The path to extract the zip file to.
 #[cfg_attr(feature = "tracing", tracing::instrument(level = "debug"))]
-pub fn extract_zip(
-    zip_path: impl AsRef<Path> + std::fmt::Debug,
-    destination: impl AsRef<Path> + std::fmt::Debug,
+pub async fn extract_zip(
+    zip_path: impl AsRef<Path>,
+    destination: impl AsRef<Path>,
 ) -> Result<()> {
     #[cfg(feature = "tracing")]
     tracing::debug!(
@@ -105,7 +104,9 @@ pub fn extract_zip(
         destination.as_ref()
     );
 
-    let file = File::open(zip_path)?;
+    let file = File::open(zip_path).await?;
+    let file = file.into_std().await;
+
     let mut archive = ZipArchive::new(file)?;
 
     for i in 0..archive.len() {
@@ -117,15 +118,15 @@ pub fn extract_zip(
 
         match file.is_file() {
             true => {
-                if let Some(parent) = destination.parent() {
-                    std::fs::create_dir_all(parent)?;
-                }
+                create_parent_dir(&destination)?;
 
-                let mut dest_file = create_file(destination)?;
+                let dest_file = create_file(&destination).await?;
+                let mut dest_file = dest_file.into_std().await;
+
                 std::io::copy(&mut file, &mut dest_file)?;
             }
             false => {
-                std::fs::create_dir_all(destination)?;
+                create_file(&destination).await?;
             }
         }
     }
@@ -140,7 +141,7 @@ pub fn extract_zip(
 /// * `tar_path` - The path to the tar.xz file.
 /// * `destination` - The path to extract the tar.xz file to.
 #[cfg_attr(feature = "tracing", tracing::instrument(level = "debug"))]
-pub fn extract_tar_xz(
+pub async fn extract_tar_xz(
     tar_path: impl AsRef<Path> + std::fmt::Debug,
     destination: impl AsRef<Path> + std::fmt::Debug,
 ) -> Result<()> {
@@ -151,7 +152,8 @@ pub fn extract_tar_xz(
         destination.as_ref()
     );
 
-    let tar_gz = File::open(tar_path)?;
+    let tar_gz = File::open(tar_path).await?;
+    let tar_gz = tar_gz.into_std().await;
 
     let decompressor = XzDecoder::new(tar_gz);
     let mut archive = Archive::new(decompressor);
